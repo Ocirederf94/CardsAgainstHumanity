@@ -1,8 +1,5 @@
-package org.academiadecodigo.roothtless;
+package org.academiadecodigo.bootcamp;
 
-
-import javafx.scene.control.Button;
-import org.academiadecodigo.bootcamp.Game;
 
 import javax.smartcardio.Card;
 import java.io.*;
