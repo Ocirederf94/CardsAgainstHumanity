@@ -1,7 +1,5 @@
-package org.academiadecodigo.roothtless;
+package org.academiadecodigo.bootcamp;
 
-
-import org.academiadecodigo.bootcamp.Game;
 
 import javax.smartcardio.Card;
 import java.util.LinkedList;
