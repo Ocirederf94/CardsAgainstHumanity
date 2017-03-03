@@ -21,16 +21,16 @@ public class Player {
     private Game game;
     private boolean czar = false;
     private int score = 0;
-    private BufferedReader inCards;
     private BufferedWriter outCards;
     private Socket playerSocket;
+    private BufferedReader inCards;
 
 
-    public Player(String name) {
+    public Player() {
         this.name = name;
         hand = new ArrayList<>();
         table = new ArrayList<>();
-
+        start();
     }
 
     public void start() {
@@ -53,7 +53,11 @@ public class Player {
 
     public void addCard() {
 
-        this.hand.add(incomeCard());
+        try {
+            this.hand.add(incomeCard());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -112,7 +116,7 @@ public class Player {
         return null;
     }
 
-    public int chooseCardInDeck() { ////////Choose number of available cards
+    public int chooseCardInDeck() throws IOException { ////////Choose number of available cards
         Scanner scanner = new Scanner(System.in);
         System.out.println("Chose card: ");
         int choice = scanner.nextInt();
@@ -123,10 +127,12 @@ public class Player {
         System.out.println("That's not a valid choice");
         return chooseCardInDeck();
     }
-    public String incomeCard(){
+
+    public String incomeCard() throws IOException {
         String line = null;
 
         try {
+            System.out.println(inCards);
             while ((line = inCards.readLine()) != null && !line.isEmpty()) {
                 line = line + "\n";
                 System.out.println(line);
@@ -137,7 +143,8 @@ public class Player {
         }
         return line;
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class ServerListener implements Runnable {
         public ServerListener() throws IOException {
             inCards = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
@@ -145,10 +152,19 @@ public class Player {
 
         @Override
         public void run() {
-            incomeCard();
+            try {
+                incomeCard();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
 
+    }
 
-}
+    public static void main(String[] args) {
+        Player player = new Player();
+        player.play();
+
+    }
 }
