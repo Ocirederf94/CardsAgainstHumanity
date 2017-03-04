@@ -21,8 +21,12 @@ public class Game {
     }
 
     public void start(int winsAt) {
+<<<<<<< HEAD
 
         /*while(player.getScore != winsAt){
+=======
+        while(player.getScore() != winsAt){
+>>>>>>> 0e5b0d5ca34b4ab2cc627c4956809ba2f180e997
             startRound();
         }*/
     }

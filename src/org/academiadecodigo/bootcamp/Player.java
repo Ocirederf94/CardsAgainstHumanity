@@ -3,6 +3,7 @@ package org.academiadecodigo.bootcamp;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,12 +12,14 @@ import java.util.Scanner;
  */
 public class Player extends Client {
 
-    private String name;
     private List<String> hand;
     private List<String> table;
     private boolean czar = false;
     private int score = 0;
     private String card;
+    private String cardUsed;
+    private String cardToClient;
+    private String winningCard;
 
 
     public Player() {
@@ -26,17 +29,23 @@ public class Player extends Client {
     }
 
 
-    /* public void start() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Choose User: ");
-        name = scanner.nextLine();
-        play();
-    }*/
+    public void blackCard(){ //get black card
+        String blackCard ;
+        if ((blackCard = getMessageFromServer()).contains("> black")){
+            blackCard = blackCard + "\n";
+            System.out.println("Black Card: " + blackCard);
+        }
+    }
 
-    public void addCard(String card) {
-        this.card = getOneCard();
-        this.hand.add(card);
 
+    public void addCard() {
+        if (getMessageFromServer().contains("> white")) {
+            this.card = getMessageFromServer();
+            this.hand.add(card);
+        }
+        if (getMessageFromServer().contains("<")) {
+            System.out.println("Chat Message: " + getMessageFromServer());
+        }
     }
 
 
@@ -47,21 +56,24 @@ public class Player extends Client {
 
     public void play() {
         for (int i = 0; i < 10; i++) {
-            addCard(card);
+            addCard();
         }
 
         while (true) {
+
             if (!isCzar()) { ////// server will choose czar and creat a get method of the boolean
                 try {
-                    String cardUsed = getPlayedCard();
+                    cardUsed = getPlayedCard();
+                    cardToClient = cardUsed;
                     hand.remove(cardUsed);
+                    System.out.println("Your Score: " + getScore());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                addCard(card);
+                addCard();
 
             } else {
-                chooseWinningCard();
+                winningCard = chooseWinningCard();
                 for (int i = 0; i < table.size(); i++) {
                     table.remove(i);
                 }
@@ -70,8 +82,27 @@ public class Player extends Client {
         }
     }
 
-    private String chooseWinningCard() {
-        Scanner scanner = new Scanner(System.in);///////Czar chooses winning card
+    public String getTable() { /// in case we want to send all the cards at the same time
+        String cards = null;
+        Iterator<String> it = table.iterator();
+        while (it.hasNext()) {
+            cards = cards + it.next();
+
+        }
+        return cards;
+    }
+
+    public String getCardToClient() { ///Send players cards to client
+        return cardToClient;
+    }
+
+    public String getWinningCard() {/// show card chosen by Czar
+        return winningCard;
+    }
+
+    private String chooseWinningCard() {///////Czar chooses winning card
+        System.out.println("You are the Czar choose the winning card!!");
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Choose card: ");
         int choice = scanner.nextInt();
         if (choice <= table.size()) {
@@ -101,6 +132,8 @@ public class Player extends Client {
     }
 
     public int chooseCardInHand() throws IOException { ////////Choose number from available cards
+        blackCard();
+        System.out.println(hand);
         Scanner scanner = new Scanner(System.in);
         System.out.println("Chose card: ");
         int choice = scanner.nextInt();
