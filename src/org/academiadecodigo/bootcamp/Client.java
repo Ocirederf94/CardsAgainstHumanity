@@ -45,10 +45,14 @@ public class Client {
 
     }
 
-  /*  public String parser(){
-        retu
+    public String parserIn() {
 
-    }*/
+
+    }
+
+    public String parserOut(){
+
+    }
 
     public String getTenCards() {
         return tenCards;
@@ -66,10 +70,22 @@ public class Client {
 
         @Override
         public void run() {
+            getinCards();
+
+        }
+
+        public String getinCards() {
+            oneCard = null;
             try {
+                while ((oneCard = inCards.readLine()) != null && !oneCard.isEmpty()) {
+                    oneCard = oneCard + "\n";
+                    System.out.println(oneCard);
+                    System.out.println("Write Message: ");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return oneCard;
         }
 
 
