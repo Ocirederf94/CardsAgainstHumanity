@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Created by codecadet on 04/03/17.
@@ -20,7 +19,7 @@ public class Client {
     private Socket playerSocket;
     private BufferedReader inCards;
     private String tenCards;
-    private String oneCard;
+    private String messageFromServer;
     private Player player;
 
     public Client() {
@@ -37,6 +36,7 @@ public class Client {
             player = new Player();
             thread.start();
             outCards = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+            parserOut();
 
 
         } catch (IOException e) {
@@ -53,15 +53,15 @@ public class Client {
 
     public void parserOut() throws IOException {
         outCards.write(player.getCardToClient());
-        outCards.write(player.getWinningCard());
+        outCards.write("> choice "  +   player.getWinningCard());
     }
 
     public String getTenCards() {
         return tenCards;
     }
 
-    public String getOneCard() {
-        return oneCard;
+    public String getMessageFromServer() {
+        return messageFromServer;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,17 +77,17 @@ public class Client {
         }
 
         public String getinCards() {
-            oneCard = null;
+            messageFromServer = null;
             try {
-                while ((oneCard = inCards.readLine()) != null && !oneCard.isEmpty()) {
-                    oneCard = oneCard + "\n";
-                    System.out.println(oneCard);
+                while ((messageFromServer = inCards.readLine()) != null && !messageFromServer.isEmpty()) {
+                    messageFromServer = messageFromServer + "\n";
+                    System.out.println(messageFromServer);
                     System.out.println("Write Message: ");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return oneCard;
+            return messageFromServer;
         }
 
 

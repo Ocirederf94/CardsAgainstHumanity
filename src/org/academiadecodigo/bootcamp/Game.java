@@ -22,7 +22,7 @@ public class Game {
     }
 
     public void start(int winsAt) {
-        while(player.getScore != winsAt){
+        while(player.getScore() != winsAt){
             startRound();
         }
     }
