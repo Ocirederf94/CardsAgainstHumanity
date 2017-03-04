@@ -1,11 +1,9 @@
 package org.academiadecodigo.bootcamp;
 
 
-import javax.smartcardio.Card;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,40 +22,27 @@ public class Player {
     private BufferedWriter outCards;
     private Socket playerSocket;
     private BufferedReader inCards;
+    private String card;
 
 
     public Player() {
         this.name = name;
         hand = new ArrayList<>();
         table = new ArrayList<>();
-        start();
+        play();
     }
 
-    public void start() {
+   /* public void start() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose User: ");
         name = scanner.nextLine();
+        play();
+    }*/
 
-        try {
-            playerSocket = new Socket("localhost", 9090);
-            Thread thread = new Thread(new ServerListener());
-            thread.start();
-            outCards = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+    public void addCard(String card) {
+        this.card = card;
+        this.hand.add(card);
 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public void addCard() {
-
-        try {
-            this.hand.add(incomeCard());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -68,17 +53,18 @@ public class Player {
 
     public void play() {
         for (int i = 0; i < 10; i++) {
-            addCard();
+            addCard(card);
         }
 
         while (true) {
             if (!isCzar()) { ////// server will choose czar and creat a get method of the boolean
                 try {
                     getPlayedCard();
+                    hand.remove(getPlayedCard());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                addCard();
+                addCard(card);
 
             } else {
                 chooseWinningCard();
@@ -96,7 +82,7 @@ public class Player {
         int choice = scanner.nextInt();
         if (choice <= table.size()) {
             for (int i = 0; i < table.size(); i++) {
-                System.out.println("The winning card is: " + table.get(i).toString());
+                System.out.println("The winning card is: " + table.get(i));
                 return table.get(i);
             }
         }
@@ -106,17 +92,17 @@ public class Player {
 
     public String getPlayedCard() throws IOException {///Choose the white card from hand
         for (int i = 0; i < hand.size(); i++) {
-            if (i == chooseCardInDeck()) {
-                System.out.println("You choose the card: " + hand.get(i).toString());
-                outCards.write(hand.get(i)); ////Sending car to tabel deck;
+            if (i == chooseCardInHand()) {
+                System.out.println("You choose the card: " + hand.get(i));
                 return hand.get(i);
+                ////Sending car to tabel deck;
             }
         }
         System.out.println("Can't find the card!!");
-        return null;
+        return getPlayedCard();
     }
 
-    public int chooseCardInDeck() throws IOException { ////////Choose number of available cards
+    public int chooseCardInHand() throws IOException { ////////Choose number of available cards
         Scanner scanner = new Scanner(System.in);
         System.out.println("Chose card: ");
         int choice = scanner.nextInt();
@@ -125,46 +111,10 @@ public class Player {
             return choice;
         }
         System.out.println("That's not a valid choice");
-        return chooseCardInDeck();
+        return chooseCardInHand();
     }
 
-    public String incomeCard() throws IOException {
-        String line = null;
-
-        try {
-            System.out.println(inCards);
-            while ((line = inCards.readLine()) != null && !line.isEmpty()) {
-                line = line + "\n";
-                System.out.println(line);
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return line;
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public class ServerListener implements Runnable {
-        public ServerListener() throws IOException {
-            inCards = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
-        }
 
-        @Override
-        public void run() {
-            try {
-                incomeCard();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-    }
-
-    public static void main(String[] args) {
-        Player player = new Player();
-        player.play();
-
-    }
 }
