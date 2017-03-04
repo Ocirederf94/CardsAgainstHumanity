@@ -1,5 +1,7 @@
 package org.academiadecodigo.bootcamp;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,9 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Server {
     //TODO Qnd se fizer o jar é suposto saber se quem inicia vai ser jogador ou servidor
-    //TODO baralhar os decks
-    //TODO escolhe randomly o czar e diz quem e o proximo
-
 
     private ConcurrentHashMap<Socket, String> list;
     private Socket clientSocket;
@@ -37,7 +36,7 @@ public class Server {
         ServerSocket serverSocket = null;
         list = new ConcurrentHashMap();
 
-//creates the sockest used and the thread clientHandler, puts the client sockets in a hashmap
+//creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
             serverSocket = new ServerSocket(portNumber);
 
@@ -93,11 +92,6 @@ public class Server {
         }
     }
 
-    private void setCzar() {
-
-
-    }
-
 
     //clientHandler thread
     private class ClientHandler implements Runnable {
@@ -110,13 +104,11 @@ public class Server {
         //sends a message to a specific player
         private void sendToPlayer(String string, String stringValue) {
 
-            System.out.println("estou");
-
             PrintWriter out = null;
 
             try {
                 out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true);
-                out.println(list.get(clientSocket) + " whispers to you" + ": " + string);
+                out.println(string);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -146,6 +138,7 @@ public class Server {
             }
         }
 
+        // closes a client socket
         private void closeClient(String string) {
             if (string == null) {
                 try {
@@ -158,7 +151,7 @@ public class Server {
         }
 
         //implements methods used by chat commands
-        private boolean implementMethods(String string) {
+        private boolean parser(String string) {
 
             boolean sendToAll = false;
 
@@ -167,7 +160,7 @@ public class Server {
 
                 switch (parts[0]) {
 
-                    case ("exit"):
+                    case ("/exit"):
                         try {
                             clientSocket.close();
                             checkConnection();
@@ -187,6 +180,7 @@ public class Server {
                             sendToAll = true;
                         }
                         break;
+
                     case "setAlias":
                         if (parts.length > 1) {
                             String playerAlias = "";
@@ -197,6 +191,33 @@ public class Server {
                             list.put(clientSocket, playerAlias.toLowerCase());
                         }
                         break;
+
+                    case "/white":
+                        //TODO implementar carta e referencia
+                        sendToAll = true;
+                        break;
+
+                    case "/isCzar":
+                        //TODO enviar mensagem ao cliente q vai ser o czar
+                        sendToAll = true;
+                        break;
+
+                    case"/winner":
+                        //TODO enviar mensagem a todos quem ganhou o round e a carta
+                        break;
+
+                    case"/score":
+                        //TODO enviar o score aos players
+                        break;
+
+                    case"/black":
+                        //TODO enviar uma carta preta
+                        break;
+
+                    case"/whoIsCzar":
+                        //TODO enviar aos jogadores quem vai ser o czar
+                        break;
+
                 }
             }
             return sendToAll;
@@ -212,7 +233,7 @@ public class Server {
                 while (true) {
                     msg = in.readLine();
                     closeClient(msg);
-                    boolean sendToAll = implementMethods(msg);
+                    boolean sendToAll = parser(msg);
                     checkConnection();
                     if (!clientSocket.isClosed()) {
                         System.out.println(msg);
