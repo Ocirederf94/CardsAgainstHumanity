@@ -11,12 +11,14 @@ import java.util.Scanner;
  */
 public class Player extends Client {
 
-    private String name;
     private List<String> hand;
     private List<String> table;
     private boolean czar = false;
     private int score = 0;
     private String card;
+    private String cardUsed;
+    private String cardToClient;
+    private String winningCard;
 
 
     public Player() {
@@ -26,14 +28,7 @@ public class Player extends Client {
     }
 
 
-    /* public void start() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Choose User: ");
-        name = scanner.nextLine();
-        play();
-    }*/
-
-    public void addCard(String card) {
+    public void addCard() {
         this.card = getOneCard();
         this.hand.add(card);
 
@@ -47,21 +42,22 @@ public class Player extends Client {
 
     public void play() {
         for (int i = 0; i < 10; i++) {
-            addCard(card);
+            addCard();
         }
 
         while (true) {
             if (!isCzar()) { ////// server will choose czar and creat a get method of the boolean
                 try {
-                    String cardUsed = getPlayedCard();
+                    cardUsed = getPlayedCard();
+                    cardToClient = cardUsed;
                     hand.remove(cardUsed);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                addCard(card);
+                addCard();
 
             } else {
-                chooseWinningCard();
+                winningCard = chooseWinningCard();
                 for (int i = 0; i < table.size(); i++) {
                     table.remove(i);
                 }
@@ -70,8 +66,16 @@ public class Player extends Client {
         }
     }
 
-    private String chooseWinningCard() {
-        Scanner scanner = new Scanner(System.in);///////Czar chooses winning card
+    public String getCardToClient() { ///Send players cards to client
+        return cardToClient;
+    }
+
+    public String getWinningCard() {
+        return winningCard;
+    }
+
+    private String chooseWinningCard() {///////Czar chooses winning card
+        Scanner scanner = new Scanner(System.in);
         System.out.println("Choose card: ");
         int choice = scanner.nextInt();
         if (choice <= table.size()) {

@@ -21,6 +21,7 @@ public class Client {
     private BufferedReader inCards;
     private String tenCards;
     private String oneCard;
+    private Player player;
 
     public Client() {
 
@@ -33,7 +34,7 @@ public class Client {
         try {
             playerSocket = new Socket("localhost", 9090);
             Thread thread = new Thread(new Client.ServerListener());
-            Player player = new Player();
+            player = new Player();
             thread.start();
             outCards = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
 
@@ -45,13 +46,14 @@ public class Client {
 
     }
 
-    public String parserIn() {
+    public void parserIn() {
 
 
     }
 
-    public String parserOut(){
-
+    public void parserOut() throws IOException {
+        outCards.write(player.getCardToClient());
+        outCards.write(player.getWinningCard());
     }
 
     public String getTenCards() {
