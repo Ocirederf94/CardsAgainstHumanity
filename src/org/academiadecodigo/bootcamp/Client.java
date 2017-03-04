@@ -45,10 +45,10 @@ public class Client {
 
     }
 
-    public String parser(){
+  /*  public String parser(){
+        retu
 
-
-    }
+    }*/
 
     public String getTenCards() {
         return tenCards;
