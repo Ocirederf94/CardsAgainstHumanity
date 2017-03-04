@@ -7,30 +7,36 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by codecadet on 01/03/17.
  */
 public class BlackDeck {
-    private ConcurrentHashMap<String, String> deck;
 
+    private final ReadFile readFile;
+    private int numberOfBlackCardsInDeck = 1448;
+    private ConcurrentHashMap<String, String> blackDeck;
+
+    public BlackDeck() {
+        blackDeck = new ConcurrentHashMap<>();
+        readFile = new ReadFile("resources/black");
+    }
 
     public void makeDeck() {
-        String card = ReadFile.retreive("resources/black");
-        while (!card.equals("eof")) {
-            String id = card.split(" ")[0];
-            deck.put(id, card);
+        String card;
+        while ((card = readFile.retreive()) != null) {
+            String id = card.split("\t")[0];
+            blackDeck.put(id, card);
         }
     }
 
     public String giveCard() {
-        Iterator<String> it = deck.keySet().iterator();
 
         String id = "";
         String card = "";
 
-        id = it.next();
+        int rndm = (int) ((Math.random() * numberOfBlackCardsInDeck) + 1);
+        id = "" + rndm;
 
-        card = deck.get(id);
+        card = blackDeck.get(id);
+        blackDeck.remove(id);
 
-        deck.remove(card);
-
-        String hand = id + card;
+        String hand = card;
 
         return hand;
     }

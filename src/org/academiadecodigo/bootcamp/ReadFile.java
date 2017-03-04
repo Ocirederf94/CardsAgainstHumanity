@@ -12,15 +12,22 @@ import java.io.IOException;
  */
 
 public class ReadFile {
+    private BufferedReader bufferedReader;
+    private FileReader fileReader;
+    private String currentLine;
 
-    public static String retreive(String filePath) {
-        BufferedReader bufferedReader = null;
-        FileReader fileReader = null;
-        String currentLine = "";
-
+    public ReadFile(String filePath) {
         try {
             fileReader = new FileReader(filePath);
-            bufferedReader = new BufferedReader(fileReader);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        bufferedReader = new BufferedReader(fileReader);
+    }
+
+    public String retreive() {
+
+        try {
 
             currentLine = bufferedReader.readLine();
 
@@ -30,7 +37,7 @@ public class ReadFile {
         } catch (IOException e) {
             e.printStackTrace();
 
-        } finally {
+        } /*finally {
 
             try {
 
@@ -44,7 +51,7 @@ public class ReadFile {
                 e.printStackTrace();
             }
 
-        }
+        }*/
         return currentLine;
     }
 }

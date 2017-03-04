@@ -1,5 +1,7 @@
 package org.academiadecodigo.bootcamp;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -7,34 +9,39 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by codecadet on 01/03/17.
  */
 public class WhiteDeck {
+    private ReadFile readFile;
     private ConcurrentHashMap<String, String> deck;
-    private int numberCards = 200;
+    private int numberOfWhiteCardsInDeck = 4959;
     private String hand;
 
+
+    public WhiteDeck() {
+        deck = new ConcurrentHashMap<>();
+        readFile = new ReadFile("resources/white");
+    }
+
     public void makeDeck() {
-        String card = ReadFile.retreive("resources/white");
-        while (!card.equals("eof")) {
-            String id = card.split(" ")[0];
+
+        String card;
+        while ((card = readFile.retreive()) != null) {
+            String id = card.split("\t")[0];
             deck.put(id, card);
         }
     }
 
     public String giveCard(int howMany) {
+
         Iterator<String> it = deck.keySet().iterator();
         String hand = "";
         String id = "";
         String card = "";
         for (int i = 0; i < howMany; i++) {
-            id = it.next();
+            int rndm = (int) ((Math.random() * numberOfWhiteCardsInDeck) + 1);
+            id = "" + rndm;
             card = deck.get(id);
-            deck.remove(card);
-            hand += id + card + "\n";
+            deck.remove(id);
+            hand += card + "\n";
         }
         return hand;
     }
 }
-
-    /*
-    Então enviamos para o cliente um string com as respectivas cartas.
-    tabalhar metodo no player para receber string e enviar a linha respectiva de volta para o servidor
-     */

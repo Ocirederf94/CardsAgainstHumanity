@@ -46,12 +46,11 @@ public class Client {
     }
 
     public String parserIn() {
-
-
+        return null;
     }
 
     public String parserOut(){
-
+        return null;
     }
 
     public String getTenCards() {

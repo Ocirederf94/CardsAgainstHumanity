@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Game {
     private WhiteDeck whiteDeck;
-    private BlackDeck blackDeck;
     private BlackDeck czarCard;
     private ConcurrentHashMap<String, String> whiteDeckList;
     private ConcurrentHashMap<String, String> blackDeckList;
@@ -18,13 +17,14 @@ public class Game {
         this.whiteDeckList = whiteDeckList;
         this.blackDeckList = blackDeckList;
         whiteDeck = new WhiteDeck();
-        blackDeck = new BlackDeck();
+        czarCard = new BlackDeck();
     }
 
     public void start(int winsAt) {
-        while(player.getScore != winsAt){
+
+        /*while(player.getScore != winsAt){
             startRound();
-        }
+        }*/
     }
 
     private void startRound() {
@@ -43,6 +43,7 @@ public class Game {
 
     /*
     -ver se estão 5 jogadores -> metodo do server
+    -o servidor tem de saber qual o cliente que é o czar.
 
     começar o jogo (metodo start):
     -dar cartas aos jogadores,
