@@ -38,8 +38,9 @@ public class Client {
 
 
     public void writeMessage(String messeageToSend) {
-            outMessage.println(messeageToSend);
-            outMessage.flush();
+        System.out.println("Sending Message: " + messeageToSend);
+        outMessage.println(messeageToSend);
+        outMessage.flush();
     }
 
 
@@ -49,7 +50,7 @@ public class Client {
             while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty()) {
 
                 messageFromServer = messageFromServer + "\n";
-               // System.out.println(messageFromServer);
+                // System.out.println(messageFromServer);
                 return messageFromServer;
 
             }
@@ -64,15 +65,15 @@ public class Client {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class ServerListener implements Runnable {
         public ServerListener() throws IOException {
+           // System.out.println("Current Thread in Client Listener: " + Thread.currentThread().getName());
             in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         }
 
         @Override
         public void run() {
 
-            while (true) {
-                getMessageFromServer();
-            }
+
+
         }
     }
 }
