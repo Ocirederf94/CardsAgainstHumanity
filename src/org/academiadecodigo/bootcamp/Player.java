@@ -46,11 +46,11 @@ public class Player {
 
     public void addCard() {
         System.out.println(" CLIENT MESSAGE" + client.getMessageFromServer());
-        try {
+        /*try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         if (client.getMessageFromServer().contains(">white")) {
             this.card = client.getMessageFromServer();
             this.hand.add(card);
@@ -73,6 +73,7 @@ public class Player {
                     cardToClient = cardUsed;
                     client.writeMessage(cardToClient);
                     hand.remove(cardUsed);
+                    setScore();
                     System.out.println("Your Score: " + getScore());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -152,8 +153,10 @@ public class Player {
         return score;
     }
 
-    public void setScore(int score) {
-        this.score = this.score + score;
+    public void setScore() {
+        if(client.getMessageFromServer().contains(">score")){
+            score = score + 1;
+        }
     }
 
 
