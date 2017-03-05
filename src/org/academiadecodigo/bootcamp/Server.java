@@ -19,18 +19,21 @@ public class Server {
     //TODO Quando se fizer o jar é suposto saber se quem inicia vai ser jogador ou servidor
 
     private ConcurrentHashMap<Socket, String> list;
-    private Socket clientSocket;
+
+    public ConcurrentHashMap<Socket, String> getList() {
+        return list;
+    }
+
     int counter = 1;
     boolean isCzar;
 
     public static void main(String[] args) {
         Server server = new Server();
         server.start();
-        //server.startGame();
     }
 
     public void start() {
-
+        Socket clientSocket;
         int portNumber = 9090;
         clientSocket = null;
         ServerSocket serverSocket = null;
@@ -40,7 +43,7 @@ public class Server {
         try {
             serverSocket = new ServerSocket(portNumber);
 
-            while (true) {
+            while (list.size() < 5) {
 
                 clientSocket = serverSocket.accept();
                 Thread client = new Thread(new ClientHandler(clientSocket));
@@ -85,6 +88,164 @@ public class Server {
         }
     }
 
+    //sends a message to a specific player
+    public void sendToPlayer(String string, String stringValue) {
+
+        PrintWriter out = null;
+
+        try {
+            out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true);
+            out.println(string);
+            System.out.println(string);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //sends message to all players
+    public void chatSendToAll(Socket msgSocket, String string) {
+        synchronized (list) {
+            PrintWriter out = null;
+            Iterator<Socket> it = list.keySet().iterator();
+            while (it.hasNext()) {
+                if (!msgSocket.isClosed()) {
+                    try {
+                        Socket tmp = it.next();
+                        if (tmp != msgSocket)
+                            out = new PrintWriter(tmp.getOutputStream(), true);
+                            out.println(list.get(msgSocket) + ": " + string);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    //sends message to all players
+    public void sendToAll(String string) {
+        synchronized (list) {
+            PrintWriter out;
+            Iterator<Socket> it = list.keySet().iterator();
+            while (it.hasNext()) {
+                Socket tmp = it.next();
+                if (!tmp.isClosed()) {
+
+                    try {
+                        out = new PrintWriter(tmp.getOutputStream(), true);
+                        out.println(string);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+
+    // closes a client socket
+    public void closeClient(Socket msgSocket, String string) {
+        if (string == null) {
+            try {
+                msgSocket.close();
+                checkConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //implements methods used by chat commands
+    public boolean parser(Socket msgSocket, String string) {
+
+        boolean sendToAll = false;
+
+        synchronized (list) {
+            String[] parts = string.split(" ");
+
+            switch (parts[0]) {
+
+                case ("/exit"):
+                    try {
+                        msgSocket.close();
+                        checkConnection();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                case "<@:":
+                    if (parts.length > 2) {
+                        String playerName = parts[1];
+                        String message = "";
+                        for (int i = 2; i < parts.length; i++) {
+                            message += parts[i] + " ";
+                        }
+                        sendToPlayer(message, playerName);
+                        sendToAll = true;
+                    }
+                    break;
+
+                case "setAlias":
+                    if (parts.length > 1) {
+                        String playerAlias = "";
+                        for (int i = 1; i < parts.length; i++) {
+                            playerAlias += parts[i];
+                        }
+
+                        list.put(msgSocket, playerAlias.toLowerCase());
+                    }
+                    break;
+
+                case "> white":
+                    //TODO implementar carta e referencia
+                    sendToAll = true;
+                    break;
+
+                case "> Czar":
+                    //TODO enviar mensagem ao cliente q vai ser o czar
+                    sendToAll = true;
+                    break;
+
+                case "> winner":
+                    //TODO enviar mensagem a todos quem ganhou o round e a carta
+                    break;
+
+                case "> score":
+                    //TODO enviar o score aos players
+                    break;
+
+                case "> black":
+                    //TODO enviar uma carta preta
+                    break;
+
+                case "> submit":
+                    //TODO white card send by players to the czar
+                    break;
+
+                case "> round":
+                    //TODO number of round
+                    break;
+
+                case "> player":
+                    //TODO name of player
+                    break;
+
+                case "> choice":
+                    //TODO card that the cazr pickd as winner
+                    break;
+
+                case "> table":
+                    //TODO the cards that the czar has to pick the winner
+                    break;
+                case "> hand":
+                    //TODO the cards that the player has
+                    break;
+            }
+        }
+        return sendToAll;
+    }
 
     //clientHandler thread
     public class ClientHandler implements Runnable {
@@ -92,143 +253,6 @@ public class Server {
 
         private ClientHandler(Socket clientSocket) {
             this.clientSocket = clientSocket;
-        }
-
-        //sends a message to a specific player
-        public void sendToPlayer(String string, String stringValue) {
-
-            PrintWriter out = null;
-
-            try {
-                out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true);
-                out.println(string);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //sends message to all players
-        public void sendToAll(String string) {
-            synchronized (list) {
-                PrintWriter out = null;
-                Iterator<Socket> it = list.keySet().iterator();
-                while (it.hasNext()) {
-                    if (!clientSocket.isClosed()) {
-
-                        try {
-                            Socket tmp = it.next();
-                            if (tmp != clientSocket)
-                                new PrintWriter(tmp.getOutputStream(), true).println(list.get(clientSocket) + ": " + string);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-
-        // closes a client socket
-        public void closeClient(String string) {
-            if (string == null) {
-                try {
-                    clientSocket.close();
-                    checkConnection();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        //implements methods used by chat commands
-        public boolean parser(String string) {
-
-            boolean sendToAll = false;
-
-            synchronized (list) {
-                String[] parts = string.split(" ");
-
-                switch (parts[0]) {
-
-                    case ("/exit"):
-                        try {
-                            clientSocket.close();
-                            checkConnection();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-
-                    case "<@:":
-                        if (parts.length > 2) {
-                            String playerName = parts[1];
-                            String message = "";
-                            for (int i = 2; i < parts.length; i++) {
-                                message += parts[i] + " ";
-                            }
-                            sendToPlayer(message, playerName);
-                            sendToAll = true;
-                        }
-                        break;
-
-                    case "setAlias":
-                        if (parts.length > 1) {
-                            String playerAlias = "";
-                            for (int i = 1; i < parts.length; i++) {
-                                playerAlias += parts[i];
-                            }
-
-                            list.put(clientSocket, playerAlias.toLowerCase());
-                        }
-                        break;
-
-                    case "> white":
-                        //TODO implementar carta e referencia
-                        sendToAll = true;
-                        break;
-
-                    case "> Czar":
-                        //TODO enviar mensagem ao cliente q vai ser o czar
-                        sendToAll = true;
-                        break;
-
-                    case"> winner":
-                        //TODO enviar mensagem a todos quem ganhou o round e a carta
-                        break;
-
-                    case"> score":
-                        //TODO enviar o score aos players
-                        break;
-
-                    case"> black":
-                        //TODO enviar uma carta preta
-                        break;
-
-                    case"> submit":
-                        //TODO white card send by players to the czar
-                        break;
-
-                    case"> round":
-                        //TODO number of round
-                        break;
-
-                    case"> player":
-                        //TODO name of player
-                        break;
-
-                    case"> choice":
-                        //TODO card that the cazr pickd as winner
-                        break;
-
-                    case"> table":
-                        //TODO the cards that the czar has to pick the winner
-                        break;
-                    case"> hand":
-                        //TODO the cards that the player has
-                        break;
-                }
-            }
-            return sendToAll;
         }
 
         //run override AKA what the new thread does
@@ -240,8 +264,8 @@ public class Server {
 
                 while (true) {
                     msg = in.readLine();
-                    closeClient(msg);
-                    boolean sendToAll = parser(msg);
+                    closeClient(clientSocket, msg);
+                    boolean sendToAll = parser(clientSocket, msg);
                     checkConnection();
                     if (!clientSocket.isClosed()) {
                         System.out.println(msg);
@@ -249,7 +273,7 @@ public class Server {
                         if (sendToAll) {
                             continue;
                         }
-                        sendToAll(msg);
+                        chatSendToAll(clientSocket, msg);
                     }
                 }
             } catch (IOException e) {

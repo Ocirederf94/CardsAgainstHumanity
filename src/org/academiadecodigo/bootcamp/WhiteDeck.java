@@ -34,12 +34,13 @@ public class WhiteDeck {
         String id = "";
         String card = "";
         for (int i = 0; i < howMany; i++) {
-            int rndm = (int) ((Math.random() * numberOfWhiteCardsInDeck) + 1);
+            int rndm = (int) (Math.random() * numberOfWhiteCardsInDeck);
             id = "" + rndm;
             card = whiteDeck.get(id);
             whiteDeck.remove(id);
             hand += card + "\n";
         }
+        System.out.println(hand);
         return hand;
     }
 }

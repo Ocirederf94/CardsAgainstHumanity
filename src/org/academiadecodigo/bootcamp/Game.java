@@ -1,5 +1,6 @@
 package org.academiadecodigo.bootcamp;
 
+import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -8,36 +9,60 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Game {
     private WhiteDeck whiteDeck;
     private BlackDeck czarCard;
-    private ConcurrentHashMap<String, String> whiteDeckList;
-    private ConcurrentHashMap<String, String> blackDeckList;
+    //private ConcurrentHashMap<String, String> whiteDeckList;
+    //private ConcurrentHashMap<String, String> blackDeckList;
     private int[] sockets = new int[5];
     private Server server;
-    private Server.ClientHandler clientHandler;
 
-    public void setDeckLists(ConcurrentHashMap<String, String> whiteDeckList, ConcurrentHashMap<String, String> blackDeckList) {
+
+
+
+   /* public void setDeckLists(ConcurrentHashMap<String, String> whiteDeckList, ConcurrentHashMap<String, String> blackDeckList) {
         this.whiteDeckList = whiteDeckList;
         this.blackDeckList = blackDeckList;
         whiteDeck = new WhiteDeck();
         czarCard = new BlackDeck();
-    }
+    }*/
 
     public void start(int winsAt) {
+        whiteDeck = new WhiteDeck();
+        czarCard = new BlackDeck();
+
+        System.out.println("aqui antes do server");
         server = new Server();
+        server.start();
+
+
+        System.out.println("aqui");
+
+
+    }
+
 
 
         /*while(player.getScore() != winsAt){
              startRound();
-        }*/
-    }
+        }
+    }*/
 
     private void startRound() {
-        giveCzar();
 
+        if (server.getList().size() == 5) {
+            whiteDeck.makeDeck();
+            int counter = 1;
+            System.out.println("tou");
+
+            for (Socket player: server.getList().keySet()) {
+                server.sendToPlayer((whiteDeck.giveCard(10)), server.getList().get(player));
+            }
+
+        }
     }
 
-    private void giveCzar() {
-        clientHandler.sendToPlayer(whiteDeck.giveCard(10), "player1");
-    }
+/*    private void giveCzar() {
+
+
+    }*/
 
     private void handPlayer() {
 
@@ -68,13 +93,10 @@ public class Game {
      */
     public static void main(String[] args) {
         Game g = new Game();
+        System.out.println("mas aqui chega");
         g.start(1);
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        g.giveCzar();
+        System.out.println("não deve chegar aqui");
+        g.startRound();
     }
 
 }

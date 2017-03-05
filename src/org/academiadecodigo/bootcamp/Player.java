@@ -101,7 +101,7 @@ public class Player extends Client {
     }
 
     private String chooseWinningCard() {///////Czar chooses winning card
-        System.out.println("You are the Czar choose the winning card!!");
+        System.out.println("You are the Czar, choose the winning card!!");
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose card: ");
         int choice = scanner.nextInt();

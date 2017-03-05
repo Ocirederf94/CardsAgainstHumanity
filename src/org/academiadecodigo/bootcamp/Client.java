@@ -29,6 +29,7 @@ public class Client {
         start();
     }
 
+
     public void start() {
         try {
             playerSocket = new Socket("localhost", 9090);
@@ -81,4 +82,5 @@ public class Client {
             return messageFromServer;
         }
     }
+
 }
