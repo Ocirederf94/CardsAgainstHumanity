@@ -46,8 +46,12 @@ public class Player {
 
 
     public void addCard() {
-
-
+        System.out.println(" CLIENT MESSAGE" + client.getMessageFromServer());
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (client.getMessageFromServer().contains("> white")) {
             this.card = client.getMessageFromServer();
             this.hand.add(card);

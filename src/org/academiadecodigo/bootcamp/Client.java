@@ -18,9 +18,14 @@ public class Client {
     }
 
     public void start() throws IOException {
-        playerSocket = new Socket("hal9000", 9090);
+        playerSocket = new Socket("localhost", 9090);
         Thread thread = new Thread(new ServerListener());
         thread.start();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
 
     }
@@ -49,7 +54,7 @@ public class Client {
     public String getMessageFromServer() {
         messageFromServer = "";
         try {
-            while ((messageFromServer = in.readLine()) != null && !messageFromServer.isEmpty()) {
+            while ((messageFromServer = in.readLine()) != null ) {
                 messageFromServer = messageFromServer + "\n";
                 System.out.println(messageFromServer);
                 System.out.println("Write Message: ");
