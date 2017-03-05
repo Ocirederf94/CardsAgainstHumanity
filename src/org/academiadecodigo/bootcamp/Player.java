@@ -154,7 +154,7 @@ public class Player {
     }
 
     public void setScore() {
-        if(client.getMessageFromServer().contains(">score")){
+        if (client.getMessageFromServer().contains(">score")) {
             score = score + 1;
         }
     }

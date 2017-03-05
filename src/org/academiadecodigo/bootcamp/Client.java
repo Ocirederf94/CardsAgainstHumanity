@@ -31,8 +31,9 @@ public class Client {
         /*out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
         message();*/
         outMessage = new PrintWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-
-
+        /*while (true) {
+            message();
+        }*/
 
     }
 
