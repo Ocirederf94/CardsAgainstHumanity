@@ -34,7 +34,7 @@ public class WhiteDeck {
         String id = "";
         String card = "";
         for (int i = 0; i < howMany; i++) {
-            int rndm = (int) (Math.random() * numberOfWhiteCardsInDeck);
+            int rndm = (int) (Math.random() * numberOfWhiteCardsInDeck - 1);
             id = "" + rndm;
             card = whiteDeck.get(id);
             whiteDeck.remove(id);

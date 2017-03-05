@@ -1,95 +1,90 @@
 package org.academiadecodigo.bootcamp;
 
 import java.net.Socket;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Iterator;
 
 /**
  * Created by codecadet on 02/03/17.
  */
 public class Game {
     private WhiteDeck whiteDeck;
-    private BlackDeck czarCard;
-    //private ConcurrentHashMap<String, String> whiteDeckList;
-    //private ConcurrentHashMap<String, String> blackDeckList;
+    private BlackDeck blackDeck;
     private int[] sockets = new int[5];
     private Server server;
-
-
-
-
-   /* public void setDeckLists(ConcurrentHashMap<String, String> whiteDeckList, ConcurrentHashMap<String, String> blackDeckList) {
-        this.whiteDeckList = whiteDeckList;
-        this.blackDeckList = blackDeckList;
-        whiteDeck = new WhiteDeck();
-        czarCard = new BlackDeck();
-    }*/
+    int gameOver;
 
     public void start(int winsAt) {
         whiteDeck = new WhiteDeck();
-        czarCard = new BlackDeck();
+        whiteDeck.makeDeck();
+        blackDeck = new BlackDeck();
+        blackDeck.makeDeck();
 
-        System.out.println("aqui antes do server");
+        gameOver = winsAt;
         server = new Server();
         server.start();
 
-
-        System.out.println("aqui");
-
-
+        if(server.getList().size() != 5){
+            server.sendToAll("Waiting fo all players...");
+        }
+        //ve se estao 5 jogadores
+        if (server.getList().size() == 5) {
+            //da as cartas aos jogadores
+            for (Socket player : server.getList().keySet()) {
+                server.sendToPlayer((whiteDeck.giveCard(10)), server.getList().get(player));
+                startRound();
+            }
+        }
     }
 
-
-
-        /*while(player.getScore() != winsAt){
-             startRound();
-        }
-    }*/
 
     private void startRound() {
 
-        if (server.getList().size() == 5) {
-            whiteDeck.makeDeck();
-            int counter = 1;
-            System.out.println("tou");
+        //escolhe o czar
+        Iterator<String> it = server.getList().values().iterator();
+        server.sendToPlayer("<isCzar ", it.next());
 
-            for (Socket player: server.getList().keySet()) {
-                server.sendToPlayer((whiteDeck.giveCard(10)), server.getList().get(player));
-            }
-
+        //da uma carta preta a todos
+        for (Socket player : server.getList().keySet()) {
+            server.sendToPlayer(blackDeck.giveCard(1), server.getList().get(player));
         }
-    }
 
-/*    private void giveCzar() {
+        //TODO faltam metodos
 
+        //dá mais uma carta a todos
+        for (Socket player : server.getList().keySet()) {
+            server.sendToPlayer((whiteDeck.giveCard(10)), server.getList().get(player));
+        }
 
-    }*/
+        /*if(playerScore(some shit like thiz) != gameOver){
+            startRound();
+        }*/
 
-    private void handPlayer() {
 
     }
 
 
     /*
-    -ver se estão 5 jogadores -> metodo do server
-    - o Game diz ao servidor qual é o servidor o cliente que é o czar.
+    -ver se estão 5 jogadores --DONE
+    - o Game diz ao servidor qual é o servidor o cliente que é o czar. //deve ser o q fiz no round --DONE
 
-    começar o jogo (metodo start):
-    ----atribuir um czar,
-    -dar cartas aos jogadores,
-    -começar ronda:
-    ----escolher uma carta preta do deck e enviar para todos,
-    ----bloquear a escolha de cartas do czar,
-    ----esperar que todos os jogadores escolham uma carta,
-    ----ver as escolhas de todos os jogadores
-    ----enviar as escolhas de cada jogador para o czar,
-    ----esperar que o czar faça uma escolha,
-    ----atribuir um ponto ao dono da carta escolhida,
-    ----mostrar um score a todos os jogadores,
-    ----atribuir uma nova carta a cada jogador,
-    ----atribuir o novo czar.
-    ----fim do round.
-    -novo round até alguem ter um score de x,
-    -mostrar a todos quem é o winner.
+    começar o jogo (metodo start):  --DONE
+    ----atribuir um czar,  //deve ser o que fiz no round --DONE
+    -dar cartas aos jogadores, --DONE
+
+    -começar ronda:  --DONE
+    ----escolher uma carta preta do deck e enviar para todos, --DONE
+    ----bloquear a escolha de cartas do czar, //Acho q tem de ser no player!
+    TODO----esperar que todos os jogadores escolham uma carta, ///acho q tenho de criar uma tableMap no game e dar lhe as cartas atraves do server, arranca qnd estiver com x cartas
+    TODO----ver as escolhas de todos os jogadores ///mostrar as cartas da table
+    TODO----enviar as escolhas de cada jogador para o czar, /// enviar para todos as escolhas
+    TODO----esperar que o czar faça uma escolha,
+    TODO----atribuir um ponto ao dono da carta escolhida, //encontrar a partir da card, onde é q vai estar o score? aposto no game...
+    TODO----mostrar um score a todos os jogadores, //mostrar esse score
+    ----atribuir uma nova carta a cada jogador, --DONE
+    ----atribuir o novo czar. //DA BARRACA, E MAIS FACIL CHEGAR AO FIM E SETAR TODOS OS CZAR PARA FALSE, QND A ROUND RECOMEÇA ESCOLHE O PROXIMO
+    ----fim do round. //this -> }
+    -novo round até alguem ter um score de x, --ALMOST DONE!!!!
+    -mostrar a todos quem é o winner. // fazer server.sendAll o nome do player q ganhou EZ PZ
      */
     public static void main(String[] args) {
         Game g = new Game();
