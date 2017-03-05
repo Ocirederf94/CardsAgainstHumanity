@@ -9,7 +9,6 @@ import java.util.Iterator;
 public class Game {
     private WhiteDeck whiteDeck;
     private BlackDeck blackDeck;
-    private int[] sockets = new int[5];
     private Server server;
     int gameOver;
 
@@ -29,11 +28,9 @@ public class Game {
 // DE METER ESTA MERDA A TRABALHAR PARA VER SE PERCEBO COMO AS RESOLVER***NAO VAI COMPILAR, ESTOU TAO FODIDO
     private void startRound() {
         String whoIsTheCzar = "";
-        System.out.println("comecou o round");
-        if (server.getMap().size() == 5) {
-            //faz um deck
 
-            System.out.println("Vou atribuir um czar");
+        if (server.getMap().size() == 5) {
+
             //escolhe o czar, cada vez q passa faz it.next e muda para o proximo
             Iterator<String> it = server.getMap().values().iterator();
 
@@ -53,18 +50,20 @@ public class Game {
             }
 
             //manda a todos uma carta preta
-                server.sendToAll(">black " + (blackDeck.giveBlackCard(1)));
-                //Todo os clientes têm de apagar os comandos, fred!
-
+            server.sendToAll(">black " + (blackDeck.giveBlackCard(1)));
+            //Todo os clientes têm de apagar os comandos, fred!
 
             //esperar que todos os jogadores escolham a carta
             //nullpointer
-            if (server.getTable().size() != 4) {
-                try {
-                    Thread.sleep(120000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            synchronized (server.getTable()) {
+                while (server.getTable().size() != 4) {
+                    try {
+                        server.getTable().wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
             }
 
             //ver as escolhas dos jogadores
@@ -78,12 +77,7 @@ public class Game {
             //esperar que o czar faça a escolha
             //qnd o czar escolhe guardo essa carta, retiro da mesa e o jogo avança
             while (server.getTable().size() != 3) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+                server.sendToPlayer(">score " , server.getWinCard().get());
             }
             //TODO atribuir um ponto ao vencedor: papel e caneta acho q tenho de pegar na carta escolhida,
             //TODO ver de quem é e aumentar um ponto ao dono dela,-> solve that and... profit!!!
@@ -121,7 +115,6 @@ public class Game {
     public static void main(String[] args) {
         Game g = new Game();
         g.start(1);
-        System.out.println("Estou depois do start e antes do round");
         g.startRound();
     }
 

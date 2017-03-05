@@ -16,11 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by codecadet on 01/03/17.
  */
 public class Server {
-    //TODO Quando se fizer o jar é suposto saber se quem inicia vai ser jogador ou se
-    // rvidor
 
     private ConcurrentHashMap<Socket, String> map;
     private ConcurrentHashMap<Socket, String> table;
+    private ConcurrentHashMap<Socket, String> winCard;
+
+    public ConcurrentHashMap<Socket, String> getWinCard() {
+        return winCard;
+    }
 
     public ConcurrentHashMap<Socket, String> getMap() {
         return map;
@@ -31,7 +34,7 @@ public class Server {
     }
 
     int counter = 1;
-    boolean isCzar;
+
 
     public static void main(String[] args) {
         Server server = new Server();
@@ -44,6 +47,8 @@ public class Server {
         clientSocket = null;
         ServerSocket serverSocket = null;
         map = new ConcurrentHashMap();
+        winCard = new ConcurrentHashMap();
+        table = new ConcurrentHashMap();
 
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
@@ -165,8 +170,9 @@ public class Server {
 
     //implements methods used by chat commands
     public boolean parser(Socket msgSocket, String string) {
-
+        String winningCard = "";
         boolean sendToAll = false;
+
 
         synchronized (map) {
             String[] parts = string.split(" ");
@@ -205,55 +211,40 @@ public class Server {
                     }
                     break;
 
-                case ">whiteTable":
+                case ">Table":
                     if (parts.length > 2) {
                         String whiteCard = "";
                         for (int i = 0; i < parts.length; i++) {
                             whiteCard += parts[i];
                         }
                         table.put(msgSocket, whiteCard);
+                        synchronized (table) {
+                            if (table.size() == 4) {
+                                table.notifyAll();
+                            }
+                        }
+
                     }
                     sendToAll = true;
                     break;
 
-                case "white":
-                    //TODO o que é este white?
+                case ">winnerCard":
+                    if (parts.length > 2) {
+                        for (int i = 0; i < parts.length; i++) {
+                            winningCard += parts[i];
+                        }
+                        table.remove(msgSocket, winningCard);
 
-                case ">winner":
-                    //TODO enviar mensagem a todos quem ganhou o round e a carta
+                        winCard.put(msgSocket, winningCard);
+
+                    }
                     break;
 
-                case ">score":
-                    //TODO enviar o score aos players
-                    break;
 
-                case ">black":
-                    //TODO enviar uma carta preta
-                    break;
 
-                case ">submit":
-                    //TODO white card send by players to the czar
-                    break;
 
-                case ">round":
-                    //TODO number of round
-                    break;
 
-                case ">player":
-                    //TODO name of player
-                    break;
 
-                case ">choice":
-                    //TODO card that the cazr pickd as winner
-                    break;
-
-                case ">table":
-                    //TODO the cards that the czar has to pick the winner
-                    break;
-
-                case ">hand":
-                    //TODO the cards that the player has
-                    break;
             }
         }
         return sendToAll;
@@ -270,6 +261,7 @@ public class Server {
         //run override AKA what the new thread does
         @Override
         public void run() {
+
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 String msg;
