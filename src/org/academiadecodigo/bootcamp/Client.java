@@ -46,23 +46,10 @@ public class Client {
 
     }
 
-<<<<<<< HEAD
-    public String parserIn() {
-        return null;
-    }
-
-    public String parserOut(){
-        return null;
-=======
-    public void parserIn() {
-
-
-    }
 
     public void parserOut() throws IOException {
         outCards.write(player.getCardToClient());
         outCards.write("> choice "  +   player.getWinningCard());
->>>>>>> 0e5b0d5ca34b4ab2cc627c4956809ba2f180e997
     }
 
     public String getTenCards() {
