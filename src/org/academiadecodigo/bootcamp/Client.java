@@ -9,34 +9,48 @@ import java.util.Scanner;
  */
 public class Client {
     private BufferedWriter out;
+    private PrintWriter outMessage;
     private Socket playerSocket;
     private BufferedReader in;
-    private String messageFromServer;
+    private String messageInReadLine;
+    private String message;
 
 
     public Client() {
     }
 
     public void start() throws IOException {
-        playerSocket = new Socket("hal9000", 9090);
+        playerSocket = new Socket("localhost", 9090);
         Thread thread = new Thread(new ServerListener());
         thread.start();
-        out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        /*try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        /*out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        message();*/
+        outMessage = new PrintWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+        /*while (true) {
+            message();
+        }*/
 
     }
 
-    public String message() {
+    public void message() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Message:");
-        String message = scanner.nextLine();
-        return message;
+        message = scanner.nextLine();
+        outMessage.println(message);
+        outMessage.flush();
     }
 
 
     public void writeMessage(String messeageToSend) {
 
+
         try {
-            out.write(messeageToSend);
+            outMessage.println(messeageToSend);
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,17 +61,20 @@ public class Client {
 
 
     public String getMessageFromServer() {
-        messageFromServer = "";
+        String messageFromServer = null;
         try {
-            while ((messageFromServer = in.readLine()) != null && !messageFromServer.isEmpty()) {
+            while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty()) {
+
                 messageFromServer = messageFromServer + "\n";
                 System.out.println(messageFromServer);
-                System.out.println("Write Message: ");
+                return messageFromServer;
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return messageFromServer;
+        System.out.println("I am in get message: " + messageFromServer);
+        return null;
     }
 
 
@@ -69,6 +86,7 @@ public class Client {
 
         @Override
         public void run() {
+
             while (true) {
                 getMessageFromServer();
             }
