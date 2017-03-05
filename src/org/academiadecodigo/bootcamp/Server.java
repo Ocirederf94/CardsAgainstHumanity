@@ -50,15 +50,19 @@ public class Server {
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
             serverSocket = new ServerSocket(portNumber);
+            System.out.println("Server started and binded to port: " + portNumber);
 
             while (mapOfPlayersSockets.size() < 5) {
 
                 clientSocket = serverSocket.accept();
+                System.out.println("Server accepted a client with socket: " + clientSocket.toString());
                 Thread client = new Thread(new ClientHandler(clientSocket));
+                System.out.println("Server started a new thread (" + client.toString() +") a client with socket: " + clientSocket.toString());
                 client.start(); // What is this?
                 mapOfPlayersSockets.put(clientSocket, "player" + counter);
+                System.out.println("Server added a new player (player" + counter +") to the map of socket clients with socket: " + clientSocket.toString());
                 counter++;
-                //System.out.println(list.keySet());
+                System.out.println("Key set list. " + mapOfPlayersSockets.keySet()+ "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,8 +91,9 @@ public class Server {
             while (it.hasNext()) {
                 Socket current = it.next();
 
-                if (mapOfPlayersSockets.get(current).equals(stringValue.toLowerCase())) {
+                if (mapOfPlayersSockets.get(current).equals(stringValue)) { // removed to lowercase
                     socket = current;
+                    System.out.println("Sending a message to socket: " + current);
                     break;
                 }
             }
@@ -102,7 +107,7 @@ public class Server {
         PrintWriter out = null;
 
         try {
-            out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true);
+            out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true); // searches the player socket by its name on the sockets map
             out.println(message);
             System.out.println(message);
         } catch (IOException e) {
@@ -197,7 +202,7 @@ public class Server {
                     }
                     break;
 
-                case "setAlias":  // This should be: /setAlias to be consistent with the /exit command
+                case "/setAlias":  // This should be: /setAlias to be consistent with the /exit command
                     if (parts.length > 1) {
                         String playerAlias = "";
                         for (int i = 1; i < parts.length; i++) {
@@ -214,7 +219,7 @@ public class Server {
                         for (int i = 0; i < parts.length; i++) {
                             whiteCard += parts[i];
                         }
-                        tableOfCzarCards.put(msgSocket, whiteCard); // this message (subm,itted card)is put into the czarTable map with
+                        tableOfCzarCards.put(msgSocket, whiteCard); // this message (submitted card)is put into the czarTable map with
                                                                     // a socket key and message value from the player that send it
                         synchronized (tableOfCzarCards) {
                             if (tableOfCzarCards.size() == 4) {
@@ -226,7 +231,7 @@ public class Server {
                     sendToAll = true;
                     break;
 
-                case ">winnerCard":// adds the winning card to the 
+                case ">winnerCard":// adds the winning card to the wincard Map
                     if (parts.length > 2) {
                         for (int i = 0; i < parts.length; i++) {
                             winningCard += parts[i];
@@ -265,7 +270,7 @@ public class Server {
                     checkConnection();
                     if (!clientSocket.isClosed()) {
                         System.out.println(msg);
-                        //receber os dados do client e decidir o q fazer com eles no metodo implement methods(acima)
+                        //receives the message from the server and decides what to do with ir
                         if (sendToAll) {
                             continue;
                         }

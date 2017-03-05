@@ -1,5 +1,7 @@
 package org.academiadecodigo.bootcamp;
 
+import org.omg.CORBA.PRIVATE_MEMBER;
+
 import java.net.Socket;
 import java.util.Iterator;
 
@@ -11,6 +13,7 @@ public class Game {
     private BlackDeck blackDeck;
     private Server server;
     int gameOver;
+    private int gameRound;
 
 
     public void start(int winsAt) {
@@ -24,9 +27,10 @@ public class Game {
 
     }
 
-    //metodos q vao acontecer durante a ronda(nao sei se os thread.sleeps funcionam!) FALTAM LA MERDAS PELO MEIO MAS TENHO
-// DE METER ESTA MERDA A TRABALHAR PARA VER SE PERCEBO COMO AS RESOLVER***NAO VAI COMPILAR, ESTOU TAO FODIDO
+    //metodos q vao acontecer durante a ronda(nao sei se os thread.sleeps funcionam!) FALTA
+// METER A TRABALHAR PARA VER SE PERCEBO COMO AS RESOLVER *** NAO VAI COMPILAR, ESTOU tramado com F
     private void startRound() {
+        gameRound++;
         String whoIsTheCzar = "";
 
         if (server.getMapOfPlayersSockets().size() == 5) {
@@ -36,22 +40,33 @@ public class Game {
 
             //envia mensagem para o player q vai ser o czar
             //TODO o cliente(FRED) tem de lidar com esta string
+
+            // the player should receive a Yes or no, after the keyword for him to set its boolean
             whoIsTheCzar = it.next();
-            server.sendToPlayer(">isCzar ", whoIsTheCzar);
+            server.sendToPlayer(">Czar \n yes\n ||", whoIsTheCzar); // who is the czar is the socket of the czar
+
+            //manda a todos uma carta preta
+            server.sendToAll(">black \n------------- Black Card ---------------\n" + (blackDeck.giveBlackCard(1)+ "---------------- choose a white card --------------\n||"));
+
+            //TODO os clientes têm de apagar os comandos, fred!
+
 
             //manda 10 cartas brancas para todos
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
-                server.sendToPlayer(">white " + (whiteDeck.giveCard(10)), server.getMapOfPlayersSockets().get(player));
+                if (gameRound ==1){
+                server.sendToPlayer(">white \n" + (whiteDeck.giveCard(10)), server.getMapOfPlayersSockets().get(player));
+                server.sendToPlayer("||", server.getMapOfPlayersSockets().get(player));
+                }
             }
 
             //manda mais uma carta branca a cada um (a cada ronda, tb a contar com a primeira
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
-                server.sendToPlayer(">white " + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player));
+                if (gameRound > 1) {
+                    server.sendToPlayer(">white \n" + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player) + "||");
+                }
             }
 
-            //manda a todos uma carta preta
-            server.sendToAll(">black " + (blackDeck.giveBlackCard(1)));
-            //Todo os clientes têm de apagar os comandos, fred!
+            //TODO os clientes têm de apagar os comandos, fred!
 
             //esperar que todos os jogadores escolham a carta
             //nullpointer
@@ -63,7 +78,6 @@ public class Game {
                         e.printStackTrace();
                     }
                 }
-
             }
 
             //ver as escolhas dos jogadores
@@ -75,7 +89,7 @@ public class Game {
             server.sendToPlayer(">white " + server.getTableOfCzarCards().values(), whoIsTheCzar);
 
             //esperar que o czar faça a escolha
-            //qnd o czar escolhe guardo essa carta, retiro da mesa e o jogo avança
+            //qnd o czar escolhe guardo essa carta, retiro todas da mesa e o jogo avança
 
  // Working on it
 
