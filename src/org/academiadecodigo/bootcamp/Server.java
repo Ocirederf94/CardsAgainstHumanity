@@ -117,9 +117,10 @@ public class Server {
                 if (!msgSocket.isClosed()) {
                     try {
                         Socket tmp = it.next();
-                        if (tmp != msgSocket)
+                        if (tmp != msgSocket) {
                             out = new PrintWriter(tmp.getOutputStream(), true);
                             out.println(map.get(msgSocket) + ": " + string);
+                        }
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -205,7 +206,7 @@ public class Server {
                     break;
 
                 case ">whiteTable":
-                    if (parts.length > 2){
+                    if (parts.length > 2) {
                         String whiteCard = "";
                         for (int i = 0; i < parts.length; i++) {
                             whiteCard += parts[i];
@@ -216,12 +217,7 @@ public class Server {
                     break;
 
                 case "white":
-
-
-                case ">Czar":
-                    //TODO enviar mensagem ao cliente q vai ser o czar
-                    sendToAll = true;
-                    break;
+                    //TODO o que é este white?
 
                 case ">winner":
                     //TODO enviar mensagem a todos quem ganhou o round e a carta
