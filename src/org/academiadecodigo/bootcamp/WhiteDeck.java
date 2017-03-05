@@ -34,8 +34,12 @@ public class WhiteDeck {
         String id = "";
         String card = "";
         for (int i = 0; i < howMany; i++) {
-            int rndm = (int) (Math.random() * numberOfWhiteCardsInDeck);
-            id = "" + rndm;
+
+            while (whiteDeck.get(id) == null || whiteDeck.get(id).equals("")) {
+                int rndm = (int) (Math.random() * numberOfWhiteCardsInDeck + 1);
+                id = "" + rndm;
+            }
+
             card = whiteDeck.get(id);
             whiteDeck.remove(id);
             hand += card + "\n";

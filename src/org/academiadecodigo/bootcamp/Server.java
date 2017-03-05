@@ -16,12 +16,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by codecadet on 01/03/17.
  */
 public class Server {
-    //TODO Quando se fizer o jar é suposto saber se quem inicia vai ser jogador ou servidor
+    //TODO Quando se fizer o jar é suposto saber se quem inicia vai ser jogador ou se
+    // rvidor
 
-    private ConcurrentHashMap<Socket, String> list;
+    private ConcurrentHashMap<Socket, String> map;
+    private ConcurrentHashMap<Socket, String> table;
 
-    public ConcurrentHashMap<Socket, String> getList() {
-        return list;
+    public ConcurrentHashMap<Socket, String> getMap() {
+        return map;
+    }
+
+    public ConcurrentHashMap<Socket, String> getTable() {
+        return table;
     }
 
     int counter = 1;
@@ -37,18 +43,18 @@ public class Server {
         int portNumber = 9090;
         clientSocket = null;
         ServerSocket serverSocket = null;
-        list = new ConcurrentHashMap();
+        map = new ConcurrentHashMap();
 
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
             serverSocket = new ServerSocket(portNumber);
 
-            while (list.size() < 5) {
+            while (map.size() < 5) {
 
                 clientSocket = serverSocket.accept();
                 Thread client = new Thread(new ClientHandler(clientSocket));
                 client.start();
-                list.put(clientSocket, "player" + counter);
+                map.put(clientSocket, "player" + counter);
                 counter++;
                 //System.out.println(list.keySet());
             }
@@ -59,12 +65,12 @@ public class Server {
 
     //kind of a garbage collector, removes the closed sockets from the hashmap
     public void checkConnection() {
-        Iterator<Socket> iterator = list.keySet().iterator();
-        synchronized (list) {
+        Iterator<Socket> iterator = map.keySet().iterator();
+        synchronized (map) {
             while (iterator.hasNext()) {
                 Socket socket = iterator.next();
                 if (socket.isClosed()) {
-                    list.remove(socket);
+                    map.remove(socket);
                 }
             }
         }
@@ -72,14 +78,14 @@ public class Server {
 
     //finds one specific player socket
     public Socket findPlayer(String stringValue) {
-        synchronized (list) {
-            Iterator<Socket> it = list.keySet().iterator();
+        synchronized (map) {
+            Iterator<Socket> it = map.keySet().iterator();
             Socket socket = null;
 
             while (it.hasNext()) {
                 Socket current = it.next();
 
-                if (list.get(current).equals(stringValue.toLowerCase())) {
+                if (map.get(current).equals(stringValue.toLowerCase())) {
                     socket = current;
                     break;
                 }
@@ -89,14 +95,14 @@ public class Server {
     }
 
     //sends a message to a specific player
-    public void sendToPlayer(String string, String stringValue) {
+    public void sendToPlayer(String message, String stringValue) {
 
         PrintWriter out = null;
 
         try {
             out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true);
-            out.println(string);
-            System.out.println(string);
+            out.println(message);
+            System.out.println(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,16 +110,17 @@ public class Server {
 
     //sends message to all players
     public void chatSendToAll(Socket msgSocket, String string) {
-        synchronized (list) {
+        synchronized (map) {
             PrintWriter out = null;
-            Iterator<Socket> it = list.keySet().iterator();
+            Iterator<Socket> it = map.keySet().iterator();
             while (it.hasNext()) {
                 if (!msgSocket.isClosed()) {
                     try {
                         Socket tmp = it.next();
-                        if (tmp != msgSocket)
+                        if (tmp != msgSocket) {
                             out = new PrintWriter(tmp.getOutputStream(), true);
-                            out.println(list.get(msgSocket) + ": " + string);
+                            out.println(map.get(msgSocket) + ": " + string);
+                        }
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -124,17 +131,17 @@ public class Server {
     }
 
     //sends message to all players
-    public void sendToAll(String string) {
-        synchronized (list) {
+    public void sendToAll(String message) {
+        synchronized (map) {
             PrintWriter out;
-            Iterator<Socket> it = list.keySet().iterator();
+            Iterator<Socket> it = map.keySet().iterator();
             while (it.hasNext()) {
                 Socket tmp = it.next();
                 if (!tmp.isClosed()) {
 
                     try {
                         out = new PrintWriter(tmp.getOutputStream(), true);
-                        out.println(string);
+                        out.println(message);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -161,7 +168,7 @@ public class Server {
 
         boolean sendToAll = false;
 
-        synchronized (list) {
+        synchronized (map) {
             String[] parts = string.split(" ");
 
             switch (parts[0]) {
@@ -194,52 +201,57 @@ public class Server {
                             playerAlias += parts[i];
                         }
 
-                        list.put(msgSocket, playerAlias.toLowerCase());
+                        map.put(msgSocket, playerAlias.toLowerCase());
                     }
                     break;
 
-                case "> white":
-                    //TODO implementar carta e referencia
+                case ">whiteTable":
+                    if (parts.length > 2) {
+                        String whiteCard = "";
+                        for (int i = 0; i < parts.length; i++) {
+                            whiteCard += parts[i];
+                        }
+                        table.put(msgSocket, whiteCard);
+                    }
                     sendToAll = true;
                     break;
 
-                case "> Czar":
-                    //TODO enviar mensagem ao cliente q vai ser o czar
-                    sendToAll = true;
-                    break;
+                case "white":
+                    //TODO o que é este white?
 
-                case "> winner":
+                case ">winner":
                     //TODO enviar mensagem a todos quem ganhou o round e a carta
                     break;
 
-                case "> score":
+                case ">score":
                     //TODO enviar o score aos players
                     break;
 
-                case "> black":
+                case ">black":
                     //TODO enviar uma carta preta
                     break;
 
-                case "> submit":
+                case ">submit":
                     //TODO white card send by players to the czar
                     break;
 
-                case "> round":
+                case ">round":
                     //TODO number of round
                     break;
 
-                case "> player":
+                case ">player":
                     //TODO name of player
                     break;
 
-                case "> choice":
+                case ">choice":
                     //TODO card that the cazr pickd as winner
                     break;
 
-                case "> table":
+                case ">table":
                     //TODO the cards that the czar has to pick the winner
                     break;
-                case "> hand":
+
+                case ">hand":
                     //TODO the cards that the player has
                     break;
             }
