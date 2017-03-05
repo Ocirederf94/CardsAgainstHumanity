@@ -1,10 +1,7 @@
 package org.academiadecodigo.bootcamp;
 
-import com.sun.xml.internal.bind.v2.TODO;
-
 import java.net.Socket;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by codecadet on 02/03/17.
@@ -25,34 +22,65 @@ public class Game {
         server.start();
 
     }
-
+//metodos q vao acontecer durante a ronda(nao sei se os thread.sleeps funcionam!) FALTAM LA MERDAS PELO MEIO MAS TENHO
+// DE METER ESTA MERDA A TRABALHAR PARA VER SE PERCEBO COMO AS RESOLVER***NAO VAI COMPILAR, ESTOU TAO FODIDO
     private void startRound() {
+        String whoIsTheCzar = "";
 
-        if (server.getList().size() == 5) {
+        if (server.getMap().size() == 5) {
             //faz um deck
             whiteDeck.makeDeck();
 
             //escolhe o czar, cada vez q passa faz it.next e muda para o proximo
-            Iterator<String> it = server.getList().values().iterator();
-            server.sendToPlayer("<isCzar ", it.next());
+            Iterator<String> it = server.getMap().values().iterator();
+            whoIsTheCzar = it.next();
+            server.sendToPlayer("<isCzar ", whoIsTheCzar);
 
             //manda 10 cartas brancas para todos
-            for (Socket player : server.getList().keySet()) {
-                server.sendToPlayer("<white " + (whiteDeck.giveCard(10)), server.getList().get(player));
+            for (Socket player : server.getMap().keySet()) {
+                server.sendToPlayer("<white " + (whiteDeck.giveCard(10)), server.getMap().get(player));
             }
 
             //manda mais uma carta branca a cada um (a cada ronda, tb a contar com a primeira
-            for (Socket player : server.getList().keySet()) {
-                server.sendToPlayer("<white " + (whiteDeck.giveCard(1)), server.getList().get(player));
+            for (Socket player : server.getMap().keySet()) {
+                server.sendToPlayer("<white " + (whiteDeck.giveCard(1)), server.getMap().get(player));
             }
 
             //manda a todos uma carta preta
             server.sendToAll("<black");
 
-            //TODO meter os metodos q faltam
+            //esperar que todos os jogadores escolham a carta
+            if (server.getTable().size() != 4) {
+                try {
+                    Thread.sleep(120000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
-            //if(playerscore(ta mal!!) != gameOver){
-            startRound();
+            //ver as escolhas dos jogadores
+            for (String values : server.getMap().values()) {
+                server.sendToAll("<white " + (server.getMap().values()));
+            }
+
+            //enviar as escolhas de cada jogador para o czar
+            server.sendToPlayer("<white " + server.getTable().values(), whoIsTheCzar);
+
+            //esperar que o czar faça a escolha
+            //qnd o czar escolhe guardo essa carta, retiro da mesa e o jogo avança
+            while (server.getTable().size() != 3){
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+                //TODO atribuir um ponto ao vencedor: papel e caneta acho q tenho de pegar na carta escolhida,
+                //TODO ver de quem é e aumentar um ponto ao dono dela,-> solve that and... profit!!!
+
+                //if(playerscore(ta mal!!) != gameOver){
+                startRound();
         }
 
         //TODO enviar o winner aos players
@@ -68,8 +96,8 @@ public class Game {
     -começar ronda:
     ----escolher uma carta preta do deck e enviar para todos,DONE
     ----bloquear a escolha de cartas do czar, ACHO Q TEM DE SER NO PLAYER
-    TODO----esperar que todos os jogadores escolham uma carta,
-    TODO----ver as escolhas de todos os jogadores
+    esperar que todos os jogadores escolham uma carta, --MIGHT BE DONE
+    ----ver as escolhas de todos os jogadores
     TODO----enviar as escolhas de cada jogador para o czar,
     TODO----esperar que o czar faça uma escolha,
     TODO----atribuir um ponto ao dono da carta escolhida,
