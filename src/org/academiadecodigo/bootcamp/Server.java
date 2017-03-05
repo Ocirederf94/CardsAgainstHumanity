@@ -1,14 +1,11 @@
 package org.academiadecodigo.bootcamp;
 
-import com.sun.xml.internal.bind.v2.TODO;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.Key;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,20 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Server {
 
-    private ConcurrentHashMap<Socket, String> map;
-    private ConcurrentHashMap<Socket, String> table;
+    private ConcurrentHashMap<Socket, String> mapOfPlayersSockets;
+    private ConcurrentHashMap<Socket, String> tableOfCzarCards;
     private ConcurrentHashMap<Socket, String> winCard;
 
     public ConcurrentHashMap<Socket, String> getWinCard() {
         return winCard;
     }
 
-    public ConcurrentHashMap<Socket, String> getMap() {
-        return map;
+    public ConcurrentHashMap<Socket, String> getMapOfPlayersSockets() {
+        return mapOfPlayersSockets;
     }
 
-    public ConcurrentHashMap<Socket, String> getTable() {
-        return table;
+    public ConcurrentHashMap<Socket, String> getTableOfCzarCards() {
+        return tableOfCzarCards;
     }
 
     int counter = 1;
@@ -46,20 +43,20 @@ public class Server {
         int portNumber = 9090;
         clientSocket = null;
         ServerSocket serverSocket = null;
-        map = new ConcurrentHashMap();
+        mapOfPlayersSockets = new ConcurrentHashMap();
         winCard = new ConcurrentHashMap();
-        table = new ConcurrentHashMap();
+        tableOfCzarCards = new ConcurrentHashMap();
 
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
             serverSocket = new ServerSocket(portNumber);
 
-            while (map.size() < 5) {
+            while (mapOfPlayersSockets.size() < 5) {
 
                 clientSocket = serverSocket.accept();
                 Thread client = new Thread(new ClientHandler(clientSocket));
-                client.start();
-                map.put(clientSocket, "player" + counter);
+                client.start(); // What is this?
+                mapOfPlayersSockets.put(clientSocket, "player" + counter);
                 counter++;
                 //System.out.println(list.keySet());
             }
@@ -68,14 +65,14 @@ public class Server {
         }
     }
 
-    //kind of a garbage collector, removes the closed sockets from the hashmap
+    //Removes the closed sockets from the hashmap
     public void checkConnection() {
-        Iterator<Socket> iterator = map.keySet().iterator();
-        synchronized (map) {
+        Iterator<Socket> iterator = mapOfPlayersSockets.keySet().iterator();
+        synchronized (mapOfPlayersSockets) {
             while (iterator.hasNext()) {
                 Socket socket = iterator.next();
                 if (socket.isClosed()) {
-                    map.remove(socket);
+                    mapOfPlayersSockets.remove(socket);
                 }
             }
         }
@@ -83,19 +80,19 @@ public class Server {
 
     //finds one specific player socket
     public Socket findPlayer(String stringValue) {
-        synchronized (map) {
-            Iterator<Socket> it = map.keySet().iterator();
-            Socket socket = null;
+        synchronized (mapOfPlayersSockets) {
+            Iterator<Socket> it = mapOfPlayersSockets.keySet().iterator();
+            Socket socket = null;  //?
 
             while (it.hasNext()) {
                 Socket current = it.next();
 
-                if (map.get(current).equals(stringValue.toLowerCase())) {
+                if (mapOfPlayersSockets.get(current).equals(stringValue.toLowerCase())) {
                     socket = current;
                     break;
                 }
             }
-            return socket;
+            return socket; // returns the socket of the found player?
         }
     }
 
@@ -113,18 +110,18 @@ public class Server {
         }
     }
 
-    //sends message to all players
+    //sends chat messages to all players
     public void chatSendToAll(Socket msgSocket, String string) {
-        synchronized (map) {
+        synchronized (mapOfPlayersSockets) {
             PrintWriter out = null;
-            Iterator<Socket> it = map.keySet().iterator();
+            Iterator<Socket> it = mapOfPlayersSockets.keySet().iterator();
             while (it.hasNext()) {
                 if (!msgSocket.isClosed()) {
                     try {
                         Socket tmp = it.next();
                         if (tmp != msgSocket) {
                             out = new PrintWriter(tmp.getOutputStream(), true);
-                            out.println(map.get(msgSocket) + ": " + string);
+                            out.println(mapOfPlayersSockets.get(msgSocket) + ": " + string);
                         }
 
                     } catch (IOException e) {
@@ -135,11 +132,11 @@ public class Server {
         }
     }
 
-    //sends message to all players
+    //sends game message to all players
     public void sendToAll(String message) {
-        synchronized (map) {
+        synchronized (mapOfPlayersSockets) {
             PrintWriter out;
-            Iterator<Socket> it = map.keySet().iterator();
+            Iterator<Socket> it = mapOfPlayersSockets.keySet().iterator();
             while (it.hasNext()) {
                 Socket tmp = it.next();
                 if (!tmp.isClosed()) {
@@ -169,17 +166,17 @@ public class Server {
     }
 
     //implements methods used by chat commands
-    public boolean parser(Socket msgSocket, String string) {
+    public boolean parser(Socket msgSocket, String string) { // The message (string) received from this socket is parsed
         String winningCard = "";
         boolean sendToAll = false;
 
 
-        synchronized (map) {
+        synchronized (mapOfPlayersSockets) {
             String[] parts = string.split(" ");
 
             switch (parts[0]) {
 
-                case ("/exit"):
+                case ("/exit"): // the client wants to exit the chat. The connection is closed exits the game also
                     try {
                         msgSocket.close();
                         checkConnection();
@@ -188,7 +185,7 @@ public class Server {
                     }
                     break;
 
-                case "<@:":
+                case "<@:": // Sends chat message to a specific player
                     if (parts.length > 2) {
                         String playerName = parts[1];
                         String message = "";
@@ -200,27 +197,27 @@ public class Server {
                     }
                     break;
 
-                case "setAlias":
+                case "setAlias":  // This should be: /setAlias to be consistent with the /exit command
                     if (parts.length > 1) {
                         String playerAlias = "";
                         for (int i = 1; i < parts.length; i++) {
                             playerAlias += parts[i];
                         }
 
-                        map.put(msgSocket, playerAlias.toLowerCase());
+                        mapOfPlayersSockets.put(msgSocket, playerAlias.toLowerCase()); // Change the name of the player to his alias
                     }
                     break;
 
-                case ">Table":
+                case ">Table": // Game commando to indicate that it is the table /group of card) of the czar
                     if (parts.length > 2) {
                         String whiteCard = "";
                         for (int i = 0; i < parts.length; i++) {
                             whiteCard += parts[i];
                         }
-                        table.put(msgSocket, whiteCard);
-                        synchronized (table) {
-                            if (table.size() == 4) {
-                                table.notifyAll();
+                        tableOfCzarCards.put(msgSocket, whiteCard); // this message is put into the czarTable map with a socket key and message value
+                        synchronized (tableOfCzarCards) {
+                            if (tableOfCzarCards.size() == 4) {
+                                tableOfCzarCards.notifyAll();
                             }
                         }
 
@@ -233,18 +230,12 @@ public class Server {
                         for (int i = 0; i < parts.length; i++) {
                             winningCard += parts[i];
                         }
-                        table.remove(msgSocket, winningCard);
+                        tableOfCzarCards.remove(msgSocket, winningCard); // removes the winning card and socket from the table of czar map.
 
-                        winCard.put(msgSocket, winningCard);
+                        winCard.put(msgSocket, winningCard); // the removed card and socket is placed in the winning card map.
 
                     }
                     break;
-
-
-
-
-
-
             }
         }
         return sendToAll;

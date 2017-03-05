@@ -29,10 +29,10 @@ public class Game {
     private void startRound() {
         String whoIsTheCzar = "";
 
-        if (server.getMap().size() == 5) {
+        if (server.getMapOfPlayersSockets().size() == 5) {
 
             //escolhe o czar, cada vez q passa faz it.next e muda para o proximo
-            Iterator<String> it = server.getMap().values().iterator();
+            Iterator<String> it = server.getMapOfPlayersSockets().values().iterator();
 
             //envia mensagem para o player q vai ser o czar
             //TODO o cliente(FRED) tem de lidar com esta string
@@ -40,13 +40,13 @@ public class Game {
             server.sendToPlayer(">isCzar ", whoIsTheCzar);
 
             //manda 10 cartas brancas para todos
-            for (Socket player : server.getMap().keySet()) {
-                server.sendToPlayer(">white " + (whiteDeck.giveCard(10)), server.getMap().get(player));
+            for (Socket player : server.getMapOfPlayersSockets().keySet()) {
+                server.sendToPlayer(">white " + (whiteDeck.giveCard(10)), server.getMapOfPlayersSockets().get(player));
             }
 
             //manda mais uma carta branca a cada um (a cada ronda, tb a contar com a primeira
-            for (Socket player : server.getMap().keySet()) {
-                server.sendToPlayer(">white " + (whiteDeck.giveCard(1)), server.getMap().get(player));
+            for (Socket player : server.getMapOfPlayersSockets().keySet()) {
+                server.sendToPlayer(">white " + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player));
             }
 
             //manda a todos uma carta preta
@@ -55,10 +55,10 @@ public class Game {
 
             //esperar que todos os jogadores escolham a carta
             //nullpointer
-            synchronized (server.getTable()) {
-                while (server.getTable().size() != 4) {
+            synchronized (server.getTableOfCzarCards()) {
+                while (server.getTableOfCzarCards().size() != 4) {
                     try {
-                        server.getTable().wait();
+                        server.getTableOfCzarCards().wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -67,18 +67,22 @@ public class Game {
             }
 
             //ver as escolhas dos jogadores
-            for (String values : server.getMap().values()) {
-                server.sendToAll(">white " + (server.getMap().values()));
+            for (String values : server.getMapOfPlayersSockets().values()) {
+                server.sendToAll(">white " + (server.getMapOfPlayersSockets().values()));
             }
 
             //enviar as escolhas de cada jogador para o czar
-            server.sendToPlayer(">white " + server.getTable().values(), whoIsTheCzar);
+            server.sendToPlayer(">white " + server.getTableOfCzarCards().values(), whoIsTheCzar);
 
             //esperar que o czar faça a escolha
             //qnd o czar escolhe guardo essa carta, retiro da mesa e o jogo avança
-            while (server.getTable().size() != 3) {
-                server.sendToPlayer(">score " , server.getWinCard().get());
-            }
+
+ // Working on it
+
+//            while (server.getTableOfCzarCards().size() != 3) {
+//                server.sendToPlayer(">winnerCard ", whoIsTheCzar);
+//                server.sendToPlayer(">score " , server.getWinCard().get());
+//            }
             //TODO atribuir um ponto ao vencedor: papel e caneta acho q tenho de pegar na carta escolhida,
             //TODO ver de quem é e aumentar um ponto ao dono dela,-> solve that and... profit!!!
 
