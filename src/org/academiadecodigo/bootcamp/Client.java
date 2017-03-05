@@ -32,6 +32,7 @@ public class Client {
         return message;
     }
 
+<<<<<<< HEAD
     public void writeMessage(String messeageToSend) {
 
         try {
@@ -40,6 +41,20 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+=======
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void parserOut() throws IOException {
+        outCards.write(player.getCardToClient());
+        outCards.write("> choice "  +   player.getWinningCard());
+    }
+
+    public String getTenCards() {
+        return tenCards;
+>>>>>>> master
     }
 
     public String getMessageFromServer() {
@@ -65,12 +80,25 @@ public class Client {
 
         @Override
         public void run() {
+<<<<<<< HEAD
             while (true) {
                 getMessageFromServer();
-            }
+=======
+            getinCards();
         }
 
-
+        public String getinCards() {
+            messageFromServer = null;
+            try {
+                while ((messageFromServer = inCards.readLine()) != null && !messageFromServer.isEmpty()) {
+                    messageFromServer = messageFromServer + "\n";
+                    System.out.println(messageFromServer);
+                    System.out.println("Write Message: ");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+>>>>>>> master
+            }
+        }
     }
-
 }

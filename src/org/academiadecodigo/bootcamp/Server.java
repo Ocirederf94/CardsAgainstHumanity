@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by codecadet on 01/03/17.
  */
 public class Server {
-    //TODO Qnd se fizer o jar é suposto saber se quem inicia vai ser jogador ou servidor
+    //TODO Quando se fizer o jar é suposto saber se quem inicia vai ser jogador ou servidor
 
     private ConcurrentHashMap<Socket, String> list;
     private Socket clientSocket;
@@ -29,7 +29,7 @@ public class Server {
         //server.startGame();
     }
 
-    private void start() {
+    public void start() {
 
         int portNumber = 9090;
         clientSocket = null;
@@ -53,16 +53,9 @@ public class Server {
             e.printStackTrace();
         }
     }
-    // starts the game
-   /* private void startGame() {
-        if (list.size() == 5) {
-            Game game = new Game();
-            game.start();
-        }
-    }*/
 
     //kind of a garbage collector, removes the closed sockets from the hashmap
-    private void checkConnection() {
+    public void checkConnection() {
         Iterator<Socket> iterator = list.keySet().iterator();
         synchronized (list) {
             while (iterator.hasNext()) {
@@ -75,7 +68,7 @@ public class Server {
     }
 
     //finds one specific player socket
-    private Socket findPlayer(String stringValue) {
+    public Socket findPlayer(String stringValue) {
         synchronized (list) {
             Iterator<Socket> it = list.keySet().iterator();
             Socket socket = null;
@@ -94,7 +87,7 @@ public class Server {
 
 
     //clientHandler thread
-    private class ClientHandler implements Runnable {
+    public class ClientHandler implements Runnable {
         private Socket clientSocket;
 
         private ClientHandler(Socket clientSocket) {
@@ -102,7 +95,7 @@ public class Server {
         }
 
         //sends a message to a specific player
-        private void sendToPlayer(String string, String stringValue) {
+        public void sendToPlayer(String string, String stringValue) {
 
             PrintWriter out = null;
 
@@ -112,12 +105,10 @@ public class Server {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
 
         //sends message to all players
-        private void sendToAll(String string) {
+        public void sendToAll(String string) {
             synchronized (list) {
                 PrintWriter out = null;
                 Iterator<Socket> it = list.keySet().iterator();
@@ -129,7 +120,6 @@ public class Server {
                             if (tmp != clientSocket)
                                 new PrintWriter(tmp.getOutputStream(), true).println(list.get(clientSocket) + ": " + string);
 
-
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -139,7 +129,7 @@ public class Server {
         }
 
         // closes a client socket
-        private void closeClient(String string) {
+        public void closeClient(String string) {
             if (string == null) {
                 try {
                     clientSocket.close();
@@ -151,7 +141,7 @@ public class Server {
         }
 
         //implements methods used by chat commands
-        private boolean parser(String string) {
+        public boolean parser(String string) {
 
             boolean sendToAll = false;
 
@@ -169,7 +159,7 @@ public class Server {
                         }
                         break;
 
-                    case "@:":
+                    case "<@:":
                         if (parts.length > 2) {
                             String playerName = parts[1];
                             String message = "";
@@ -192,32 +182,50 @@ public class Server {
                         }
                         break;
 
-                    case "/white":
+                    case "> white":
                         //TODO implementar carta e referencia
                         sendToAll = true;
                         break;
 
-                    case "/isCzar":
+                    case "> Czar":
                         //TODO enviar mensagem ao cliente q vai ser o czar
                         sendToAll = true;
                         break;
 
-                    case"/winner":
+                    case"> winner":
                         //TODO enviar mensagem a todos quem ganhou o round e a carta
                         break;
 
-                    case"/score":
+                    case"> score":
                         //TODO enviar o score aos players
                         break;
 
-                    case"/black":
+                    case"> black":
                         //TODO enviar uma carta preta
                         break;
 
-                    case"/whoIsCzar":
-                        //TODO enviar aos jogadores quem vai ser o czar
+                    case"> submit":
+                        //TODO white card send by players to the czar
                         break;
 
+                    case"> round":
+                        //TODO number of round
+                        break;
+
+                    case"> player":
+                        //TODO name of player
+                        break;
+
+                    case"> choice":
+                        //TODO card that the cazr pickd as winner
+                        break;
+
+                    case"> table":
+                        //TODO the cards that the czar has to pick the winner
+                        break;
+                    case"> hand":
+                        //TODO the cards that the player has
+                        break;
                 }
             }
             return sendToAll;
