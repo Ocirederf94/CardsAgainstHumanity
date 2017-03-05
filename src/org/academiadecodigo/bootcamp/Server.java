@@ -198,48 +198,48 @@ public class Server {
                     }
                     break;
 
-                case "> white":
+                case ">white ":
                     //TODO implementar carta e referencia
                     sendToAll = true;
                     break;
 
-                case "> Czar":
+                case ">Czar ":
                     //TODO enviar mensagem ao cliente q vai ser o czar
                     sendToAll = true;
                     break;
 
-                case "> winner":
+                case ">winner ":
                     //TODO enviar mensagem a todos quem ganhou o round e a carta
                     break;
 
-                case "> score":
+                case ">score ":
                     //TODO enviar o score aos players
                     break;
 
-                case "> black":
+                case ">black ":
                     //TODO enviar uma carta preta
                     break;
 
-                case "> submit":
+                case ">submit ":
                     //TODO white card send by players to the czar
                     break;
 
-                case "> round":
+                case ">round ":
                     //TODO number of round
                     break;
 
-                case "> player":
+                case ">player ":
                     //TODO name of player
                     break;
 
-                case "> choice":
+                case ">choice ":
                     //TODO card that the cazr pickd as winner
                     break;
 
-                case "> table":
+                case ">table ":
                     //TODO the cards that the czar has to pick the winner
                     break;
-                case "> hand":
+                case ">hand ":
                     //TODO the cards that the player has
                     break;
             }

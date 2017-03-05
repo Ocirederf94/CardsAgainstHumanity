@@ -25,19 +25,21 @@ public class BlackDeck {
         }
     }
 
-    public String giveCard() {
+    public String giveBlackCard(int howMany) {
 
+        Iterator<String> it = blackDeck.keySet().iterator();
+        String hand = "";
         String id = "";
         String card = "";
-
-        int rndm = (int) ((Math.random() * numberOfBlackCardsInDeck) + 1);
-        id = "" + rndm;
-
-        card = blackDeck.get(id);
-        blackDeck.remove(id);
-
-        String hand = card;
-
+        for (int i = 0; i < howMany; i++) {
+            int rndm = (int) (Math.random() * numberOfBlackCardsInDeck);
+            id = "" + rndm;
+            card = blackDeck.get(id);
+            blackDeck.remove(id);
+            hand += card + "\n";
+        }
+        System.out.println(hand);
         return hand;
     }
 }
+
