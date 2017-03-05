@@ -208,13 +208,14 @@ public class Server {
                     }
                     break;
 
-                case ">Table": // Game commando to indicate that it is the table /group of card) of the czar
+                case ">Table": // Game command to indicate that it is the table /group of card) of the czar
                     if (parts.length > 2) {
                         String whiteCard = "";
                         for (int i = 0; i < parts.length; i++) {
                             whiteCard += parts[i];
                         }
-                        tableOfCzarCards.put(msgSocket, whiteCard); // this message is put into the czarTable map with a socket key and message value
+                        tableOfCzarCards.put(msgSocket, whiteCard); // this message (subm,itted card)is put into the czarTable map with
+                                                                    // a socket key and message value from the player that send it
                         synchronized (tableOfCzarCards) {
                             if (tableOfCzarCards.size() == 4) {
                                 tableOfCzarCards.notifyAll();
@@ -225,7 +226,7 @@ public class Server {
                     sendToAll = true;
                     break;
 
-                case ">winnerCard":
+                case ">winnerCard":// adds the winning card to the 
                     if (parts.length > 2) {
                         for (int i = 0; i < parts.length; i++) {
                             winningCard += parts[i];
