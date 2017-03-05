@@ -4,7 +4,6 @@ package org.academiadecodigo.bootcamp;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -12,8 +11,8 @@ import java.util.Scanner;
  */
 public class Player {
 
-    private List<String> hand;
-    private List<String> table;
+    private ArrayList<String> hand = new ArrayList<>();
+    private ArrayList<String> table = new ArrayList<>();
     private int score = 0;
     private String card;
     private String cardUsed;
@@ -24,8 +23,8 @@ public class Player {
 
     public Player() {
         try {
-            hand = new ArrayList<>();
-            table = new ArrayList<>();
+            /*hand = new ArrayList<>();
+            table = new ArrayList<>();*/
             client = new Client();
             client.start();
         } catch (IOException e) {
@@ -45,49 +44,48 @@ public class Player {
 
 
     public void addCard() {
-        System.out.println(" CLIENT MESSAGE" + client.getMessageFromServer());
-        /*try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        hand.add(client.getMessageFromServer());
+        /*if (client.getMessageFromServer().contains(">white")) {
+        System.out.println("I am in add Card white ");
         }*/
-        if (client.getMessageFromServer().contains(">white")) {
-            this.card = client.getMessageFromServer();
-            this.hand.add(card);
-        }
-        if (client.getMessageFromServer().contains("<")) {
+        /*if (client.getMessageFromServer().contains("<")) {
             System.out.println("Chat Message: " + client.getMessageFromServer());
-        }
+        }*/
     }
 
     public void play() {
         for (int i = 0; i < 10; i++) {
             addCard();
         }
-
+        System.out.println(hand);
+        System.out.println(hand.get(2));
         while (true) {
 
-            if (!client.getMessageFromServer().contains(">isCzar")) { ////// server will choose czar and create a get method of the boolean
+            if (client.getMessageFromServer().contains(">white")) { ////// server will choose czar and create a get method of the boolean
                 try {
+                    addCard();
+                    System.out.println("I am in play after addcard");
                     cardUsed = getPlayedCard();
+                    System.out.println("I am in play getPlayerCard");
+
                     cardToClient = cardUsed;
                     client.writeMessage(cardToClient);
                     hand.remove(cardUsed);
                     setScore();
                     System.out.println("Your Score: " + getScore());
+                    addCard();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                addCard();
 
-            } else {
+            } /*else {
                 winningCard = chooseWinningCard();
                 client.writeMessage(winningCard);
                 for (int i = 0; i < table.size(); i++) {
                     table.remove(i);
                 }
 
-            }
+            }*/
         }
     }
 
@@ -122,8 +120,12 @@ public class Player {
     }
 
     public String getPlayedCard() throws IOException {///Choose the white card from hand
+        System.out.println("YOUR HAND!!!" + hand);
         blackCard();
-        System.out.println(hand);
+        for (int i = 0; i < hand.size(); i++) {
+            System.out.println(hand.size() + "Your Hand: " + hand.get(i));
+        }
+        chooseCardInHand();
         for (int i = 0; i < hand.size(); i++) {
             if (i == chooseCardInHand()) {
                 System.out.println("You choose the card: " + hand.get(i));
