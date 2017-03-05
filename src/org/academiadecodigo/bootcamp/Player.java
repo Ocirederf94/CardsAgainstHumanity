@@ -14,7 +14,6 @@ public class Player {
 
     private List<String> hand;
     private List<String> table;
-    private boolean czar = false;
     private int score = 0;
     private String card;
     private String cardUsed;
@@ -27,7 +26,7 @@ public class Player {
         try {
             hand = new ArrayList<>();
             table = new ArrayList<>();
-            Client client = new Client();
+            client = new Client();
             client.start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,7 +37,7 @@ public class Player {
 
     public void blackCard() { //get black card
         String blackCard;
-        if ((blackCard = client.getMessageFromServer()).contains("> black")) {
+        if ((blackCard = client.getMessageFromServer()).contains(">black")) {
             blackCard = blackCard + "\n";
             System.out.println("Black Card: " + blackCard);
         }
@@ -48,23 +47,17 @@ public class Player {
     public void addCard() {
         System.out.println(" CLIENT MESSAGE" + client.getMessageFromServer());
         try {
-            Thread.sleep(5000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (client.getMessageFromServer().contains("> white")) {
+        if (client.getMessageFromServer().contains(">white")) {
             this.card = client.getMessageFromServer();
             this.hand.add(card);
         }
         if (client.getMessageFromServer().contains("<")) {
             System.out.println("Chat Message: " + client.getMessageFromServer());
         }
-    }
-
-
-    public boolean isCzar() {
-        return czar;
-
     }
 
     public void play() {
@@ -74,7 +67,7 @@ public class Player {
 
         while (true) {
 
-            if (!isCzar()) { ////// server will choose czar and create a get method of the boolean
+            if (!client.getMessageFromServer().contains(">isCzar")) { ////// server will choose czar and create a get method of the boolean
                 try {
                     cardUsed = getPlayedCard();
                     cardToClient = cardUsed;

@@ -21,11 +21,11 @@ public class Client {
         playerSocket = new Socket("localhost", 9090);
         Thread thread = new Thread(new ServerListener());
         thread.start();
-        try {
+        /*try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
 
     }
@@ -52,9 +52,9 @@ public class Client {
 
 
     public String getMessageFromServer() {
-        messageFromServer = "";
         try {
-            while ((messageFromServer = in.readLine()) != null ) {
+            while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty() ) {
+
                 messageFromServer = messageFromServer + "\n";
                 System.out.println(messageFromServer);
                 System.out.println("Write Message: ");
@@ -74,6 +74,7 @@ public class Client {
 
         @Override
         public void run() {
+
             while (true) {
                 getMessageFromServer();
             }
