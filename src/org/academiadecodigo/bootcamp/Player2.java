@@ -103,10 +103,13 @@ public class Player2 {
         int cardToChoose = -1;
         addBlackCard();
         getTableCards();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while (table.size() < 4){
+            System.out.println("Waiting for players to Play");
+            try {
+                Thread.sleep(6000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         System.out.println("CZAR TABLE: " + table);
         System.out.println("Choose the Winner Card!!!");
