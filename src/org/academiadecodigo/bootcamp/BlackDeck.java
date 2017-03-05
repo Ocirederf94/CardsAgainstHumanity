@@ -25,7 +25,7 @@ public class BlackDeck {
         }
     }
 
-    public String giveCard(int howMany) {
+    public String giveBlackCard(int howMany) {
 
         Iterator<String> it = blackDeck.keySet().iterator();
         String hand = "";
@@ -42,3 +42,4 @@ public class BlackDeck {
         return hand;
     }
 }
+
