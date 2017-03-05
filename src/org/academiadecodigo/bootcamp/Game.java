@@ -11,7 +11,8 @@ public class Game {
     private ConcurrentHashMap<String, String> whiteDeckList;
     private ConcurrentHashMap<String, String> blackDeckList;
     private int[] sockets = new int[5];
-    private Player player;
+    private Server server;
+    private Server.ClientHandler clientHandler;
 
     public void setDeckLists(ConcurrentHashMap<String, String> whiteDeckList, ConcurrentHashMap<String, String> blackDeckList) {
         this.whiteDeckList = whiteDeckList;
@@ -21,6 +22,7 @@ public class Game {
     }
 
     public void start(int winsAt) {
+        server = new Server();
 
 
         /*while(player.getScore() != winsAt){
@@ -30,11 +32,11 @@ public class Game {
 
     private void startRound() {
         giveCzar();
-        whiteDeck.giveCard(1);
+
     }
 
     private void giveCzar() {
-
+        clientHandler.sendToPlayer(whiteDeck.giveCard(10), "player1");
     }
 
     private void handPlayer() {
@@ -44,12 +46,12 @@ public class Game {
 
     /*
     -ver se estão 5 jogadores -> metodo do server
-    -o servidor tem de saber qual o cliente que é o czar.
+    - o Game diz ao servidor qual é o servidor o cliente que é o czar.
 
     começar o jogo (metodo start):
+    ----atribuir um czar,
     -dar cartas aos jogadores,
     -começar ronda:
-    ----atribuir um czar,
     ----escolher uma carta preta do deck e enviar para todos,
     ----bloquear a escolha de cartas do czar,
     ----esperar que todos os jogadores escolham uma carta,
@@ -64,6 +66,15 @@ public class Game {
     -novo round até alguem ter um score de x,
     -mostrar a todos quem é o winner.
      */
-
+    public static void main(String[] args) {
+        Game g = new Game();
+        g.start(1);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        g.giveCzar();
+    }
 
 }

@@ -38,14 +38,10 @@ public class Client {
             outCards = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
             parserOut();
 
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
-
 
     public void parserOut() throws IOException {
         outCards.write(player.getCardToClient());
@@ -69,7 +65,6 @@ public class Client {
         @Override
         public void run() {
             getinCards();
-
         }
 
         public String getinCards() {
@@ -85,8 +80,5 @@ public class Client {
             }
             return messageFromServer;
         }
-
-
     }
-
 }
