@@ -10,7 +10,7 @@ import java.util.Scanner;
 /**
  * Created by codecadet on 01/03/17.
  */
-public class Player extends Client {
+public class Player {
 
     private List<String> hand;
     private List<String> table;
@@ -20,18 +20,25 @@ public class Player extends Client {
     private String cardUsed;
     private String cardToClient;
     private String winningCard;
+    private Client client;
 
 
     public Player() {
-        hand = new ArrayList<>();
-        table = new ArrayList<>();
-        play();
+        try {
+            hand = new ArrayList<>();
+            table = new ArrayList<>();
+            Client client = new Client();
+            client.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
-    public void blackCard(){ //get black card
-        String blackCard ;
-        if ((blackCard = getMessageFromServer()).contains("> black")){
+    public void blackCard() { //get black card
+        String blackCard;
+        if ((blackCard = client.getMessageFromServer()).contains("> black")) {
             blackCard = blackCard + "\n";
             System.out.println("Black Card: " + blackCard);
         }
@@ -39,12 +46,14 @@ public class Player extends Client {
 
 
     public void addCard() {
-        if (getMessageFromServer().contains("> white")) {
-            this.card = getMessageFromServer();
+
+
+        if (client.getMessageFromServer().contains("> white")) {
+            this.card = client.getMessageFromServer();
             this.hand.add(card);
         }
-        if (getMessageFromServer().contains("<")) {
-            System.out.println("Chat Message: " + getMessageFromServer());
+        if (client.getMessageFromServer().contains("<")) {
+            System.out.println("Chat Message: " + client.getMessageFromServer());
         }
     }
 
@@ -61,10 +70,11 @@ public class Player extends Client {
 
         while (true) {
 
-            if (!isCzar()) { ////// server will choose czar and creat a get method of the boolean
+            if (!isCzar()) { ////// server will choose czar and create a get method of the boolean
                 try {
                     cardUsed = getPlayedCard();
                     cardToClient = cardUsed;
+                    client.writeMessage(cardToClient);
                     hand.remove(cardUsed);
                     System.out.println("Your Score: " + getScore());
                 } catch (IOException e) {
@@ -74,6 +84,7 @@ public class Player extends Client {
 
             } else {
                 winningCard = chooseWinningCard();
+                client.writeMessage(winningCard);
                 for (int i = 0; i < table.size(); i++) {
                     table.remove(i);
                 }
@@ -92,16 +103,10 @@ public class Player extends Client {
         return cards;
     }
 
-    public String getCardToClient() { ///Send players cards to client
-        return cardToClient;
-    }
-
-    public String getWinningCard() {/// show card chosen by Czar
-        return winningCard;
-    }
 
     private String chooseWinningCard() {///////Czar chooses winning card
-        System.out.println("You are the Czar, choose the winning card!!");
+        blackCard();
+        System.out.println("You are the Czar choose the winning card!!");
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose card: ");
         int choice = scanner.nextInt();
@@ -119,6 +124,8 @@ public class Player extends Client {
     }
 
     public String getPlayedCard() throws IOException {///Choose the white card from hand
+        blackCard();
+        System.out.println(hand);
         for (int i = 0; i < hand.size(); i++) {
             if (i == chooseCardInHand()) {
                 System.out.println("You choose the card: " + hand.get(i));
@@ -131,9 +138,8 @@ public class Player extends Client {
         return getPlayedCard();
     }
 
-    public int chooseCardInHand() throws IOException { ////////Choose number from available cards
-        blackCard();
-        System.out.println(hand);
+    public int chooseCardInHand() throws IOException { //////// Choose card number from available cards
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Chose card: ");
         int choice = scanner.nextInt();
@@ -152,6 +158,7 @@ public class Player extends Client {
     public void setScore(int score) {
         this.score = this.score + score;
     }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

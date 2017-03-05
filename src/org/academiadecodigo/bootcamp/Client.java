@@ -2,85 +2,76 @@ package org.academiadecodigo.bootcamp;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by codecadet on 04/03/17.
  */
 public class Client {
-    private String name;
-    private List<String> hand;
-    private List<String> table;
-    private Game game;
-    private boolean czar = false;
-    private int score = 0;
-    private BufferedWriter outCards;
+    private BufferedWriter out;
     private Socket playerSocket;
-    private BufferedReader inCards;
-    private String tenCards;
+    private BufferedReader in;
     private String messageFromServer;
-    private Player player;
+
 
     public Client() {
+    }
 
-        hand = new ArrayList<>();
-        table = new ArrayList<>();
-        start();
+    public void start() throws IOException {
+        playerSocket = new Socket("hal9000", 9090);
+        Thread thread = new Thread(new ServerListener());
+        thread.start();
+        out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
+
+    }
+
+    public String message() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Message:");
+        String message = scanner.nextLine();
+        return message;
     }
 
 
-    public void start() {
-        try {
-            playerSocket = new Socket("localhost", 9090);
-            Thread thread = new Thread(new Client.ServerListener());
-            player = new Player();
-            thread.start();
-            outCards = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-            parserOut();
+    public void writeMessage(String messeageToSend) {
 
+        try {
+            out.write(messeageToSend);
+            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
-    public void parserOut() throws IOException {
-        outCards.write(player.getCardToClient());
-        outCards.write("> choice "  +   player.getWinningCard());
-    }
-
-    public String getTenCards() {
-        return tenCards;
-    }
 
     public String getMessageFromServer() {
+        messageFromServer = "";
+        try {
+            while ((messageFromServer = in.readLine()) != null && !messageFromServer.isEmpty()) {
+                messageFromServer = messageFromServer + "\n";
+                System.out.println(messageFromServer);
+                System.out.println("Write Message: ");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return messageFromServer;
     }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class ServerListener implements Runnable {
         public ServerListener() throws IOException {
-            inCards = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         }
 
         @Override
         public void run() {
-            getinCards();
-        }
-
-        public String getinCards() {
-            messageFromServer = null;
-            try {
-                while ((messageFromServer = inCards.readLine()) != null && !messageFromServer.isEmpty()) {
-                    messageFromServer = messageFromServer + "\n";
-                    System.out.println(messageFromServer);
-                    System.out.println("Write Message: ");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            while (true) {
+                getMessageFromServer();
             }
-            return messageFromServer;
         }
     }
-
 }
