@@ -104,7 +104,6 @@ public class Player {
     }
 
 
-
     private String chooseWinningCard() {///////Czar chooses winning card
         blackCard();
         System.out.println("You are the Czar choose the winning card!!");
@@ -125,6 +124,8 @@ public class Player {
     }
 
     public String getPlayedCard() throws IOException {///Choose the white card from hand
+        blackCard();
+        System.out.println(hand);
         for (int i = 0; i < hand.size(); i++) {
             if (i == chooseCardInHand()) {
                 System.out.println("You choose the card: " + hand.get(i));
@@ -138,8 +139,7 @@ public class Player {
     }
 
     public int chooseCardInHand() throws IOException { //////// Choose card number from available cards
-        blackCard();
-        System.out.println(hand);
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Chose card: ");
         int choice = scanner.nextInt();
