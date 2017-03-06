@@ -43,10 +43,10 @@ public class Game {
 
             // the player should receive a Yes or no, after the keyword for him to set its boolean
             whoIsTheCzar = it.next();
-            server.sendToPlayer(">Czar \n yes\n ||", whoIsTheCzar); // who is the czar is the socket of the czar
+            server.sendToPlayer(">Czar ", whoIsTheCzar); // who is the czar is the socket of the czar
 
             //manda a todos uma carta preta
-            server.sendToAll(">black \n--------------- Black Card ---------------\n" + (blackDeck.giveBlackCard(1)+ "---------------- choose a white card --------------\n||"));
+            server.sendToAll(">black " + (blackDeck.giveBlackCard(1)));
 
             //TODO os clientes têm de apagar os comandos, fred!
 
@@ -54,16 +54,16 @@ public class Game {
             //manda 10 cartas brancas para todos
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
                 if (gameRound ==1){
-                    for (int i = 0; i <10; i++) {
-                        server.sendToPlayer(">white \n" + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player) + "||");
+                    // for (int i = 0; i <10; i++) {
+                        server.sendToPlayer(">white " + (whiteDeck.giveCard(10)), server.getMapOfPlayersSockets().get(player));
                     }
-                }
+                //}
             }
 
             //manda mais uma carta branca a cada um (a cada ronda, tb a contar com a primeira
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
                 if (gameRound > 1) {
-                    server.sendToPlayer(">white \n" + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player) + "||");
+                    server.sendToPlayer(">white " + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player));
                 }
             }
 
