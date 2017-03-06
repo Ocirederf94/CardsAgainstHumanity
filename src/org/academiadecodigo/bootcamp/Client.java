@@ -12,7 +12,7 @@ public class Client {
     private Socket playerSocket;
     private BufferedReader in;
     private String message;
-
+    private String messageFromServer = null;
 
     public Client() {
     }
@@ -45,12 +45,12 @@ public class Client {
 
 
     public String getMessageFromServer() {
-        String messageFromServer = null;
+        messageFromServer = null;
         try {
             while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty()) {
 
                 messageFromServer = messageFromServer + "\n";
-                 System.out.println("XALANA ISTO É O QUE TA A CHEGAR: " + messageFromServer);
+                //   System.out.println("XALANA ISTO É O QUE TA A CHEGAR: " + messageFromServer);
                 return messageFromServer;
 
             }
@@ -65,7 +65,7 @@ public class Client {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class ServerListener implements Runnable {
         public ServerListener() throws IOException {
-           // System.out.println("Current Thread in Client Listener: " + Thread.currentThread().getName());
+            // System.out.println("Current Thread in Client Listener: " + Thread.currentThread().getName());
             in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         }
 
@@ -73,7 +73,13 @@ public class Client {
         public void run() {
 
 
-
         }
     }
+
+    public String getMessage() {
+        return messageFromServer;
+     //client.geMessage();
+    }
+
+
 }

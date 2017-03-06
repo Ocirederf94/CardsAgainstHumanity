@@ -58,12 +58,34 @@ public class Player2 {
 
     public void play() {
         while (true) {
+            if (client.getMessageFromServer().contains(">white ")) {
+                System.out.println("In play");
+                addCards();
+                System.out.println("After addCards");
+                playCard();
+                System.out.println("After playCard()");
+                System.out.println("You removed: " + hand.remove(intGet));
 
-            if (client.getMessageFromServer().contains(">isCzar")) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                while (!client.getMessageFromServer().contains(">winnerCard ")) {
+                    try {
+                        System.out.println("Waiting for winner");
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+             else if (client.getMessageFromServer().contains(">Czar ")) {
                 System.out.println("I am THE CZAR!!!!");
                 chooseCard();
                 System.out.println("After chooseCard()");
-                for (int i = 0; i < table.size() ; i++) {
+                for (int i = 0; i < table.size(); i++) {
                     System.out.println("Removing from table: " + table.remove(i));
                 }
                 while (!client.getMessageFromServer().contains(">winnerCard")) {
@@ -75,35 +97,15 @@ public class Player2 {
                     }
                 }
             }
-            System.out.println("In play");
-            addCards();
-            System.out.println("After addCards");
-            playCard();
-            System.out.println("After playCard()");
-            System.out.println("You removed: " + hand.remove(intGet));
-
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            while (!client.getMessageFromServer().contains(">winnerCard")) {
-                try {
-                    System.out.println("Waiting for winner");
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
         }
+
     }
 
     private String chooseCard() { /////// METHOD FROM CZAR
         int cardToChoose = -1;
-        addBlackCard();
+        //  addBlackCard();
         getTableCards();
-        while (table.size() < 4){
+        while (table.size() < 4) {
             System.out.println("Waiting for players to Play");
             try {
                 Thread.sleep(6000);
@@ -128,7 +130,7 @@ public class Player2 {
 
     private void getTableCards() { ///// METHOD FOR CZAR TO GET CARD TO TABLE
 
-        if ((tableCards = client.getMessageFromServer()).contains(">table ")){
+        if ((tableCards = client.getMessageFromServer()).contains(">table ")) {
             table.add(tableCards);
         }
 
@@ -136,9 +138,9 @@ public class Player2 {
 
     private String playCard() {
         int cardToPlay = -1;
+        //addBlackCard();
         System.out.println("YOUR HAND: " + hand);
         System.out.println("Size of the hand: " + hand.size());
-        addBlackCard();
         Scanner scanner = new Scanner(System.in);
         System.out.println("Choose Card: ");
         cardToPlay = scanner.nextInt();
