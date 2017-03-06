@@ -10,6 +10,5 @@ public class ClientMain {
 
         Player player = new Player();
         player.play();
-
     }
 }

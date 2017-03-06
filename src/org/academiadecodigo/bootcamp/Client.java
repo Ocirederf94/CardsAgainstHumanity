@@ -8,11 +8,9 @@ import java.util.Scanner;
  * Created by codecadet on 04/03/17.
  */
 public class Client {
-    private BufferedWriter out;
     private PrintWriter outMessage;
     private Socket playerSocket;
     private BufferedReader in;
-    private String messageInReadLine;
     private String message;
 
 
@@ -23,15 +21,8 @@ public class Client {
         playerSocket = new Socket("localhost", 9090);
         Thread thread = new Thread(new ServerListener());
         thread.start();
-        /*try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        /*out = new BufferedWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-        message();*/
         outMessage = new PrintWriter(new OutputStreamWriter(playerSocket.getOutputStream()));
-        /*while (true) {
+      /*  while (true) {
             message();
         }*/
 
@@ -47,16 +38,9 @@ public class Client {
 
 
     public void writeMessage(String messeageToSend) {
-
-
-        try {
-            outMessage.println(messeageToSend);
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
+        System.out.println("Sending Message: " + messeageToSend);
+        outMessage.println(messeageToSend);
+        outMessage.flush();
     }
 
 
@@ -66,7 +50,7 @@ public class Client {
             while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty()) {
 
                 messageFromServer = messageFromServer + "\n";
-                System.out.println(messageFromServer);
+                // System.out.println(messageFromServer);
                 return messageFromServer;
 
             }
@@ -81,15 +65,15 @@ public class Client {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public class ServerListener implements Runnable {
         public ServerListener() throws IOException {
+           // System.out.println("Current Thread in Client Listener: " + Thread.currentThread().getName());
             in = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
         }
 
         @Override
         public void run() {
 
-            while (true) {
-                getMessageFromServer();
-            }
+
+
         }
     }
 }
