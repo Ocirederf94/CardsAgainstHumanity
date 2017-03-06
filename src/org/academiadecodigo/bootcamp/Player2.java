@@ -128,7 +128,7 @@ public class Player2 {
 
     private void getTableCards() { ///// METHOD FOR CZAR TO GET CARD TO TABLE
 
-        if ((tableCards = client.getMessageFromServer()).contains(">table")){
+        if ((tableCards = client.getMessageFromServer()).contains(">table ")){
             table.add(tableCards);
         }
 
@@ -145,7 +145,7 @@ public class Player2 {
         intGet = cardToPlay;
         if (cardToPlay <= hand.size()) {
             System.out.println("You choose the card: " + hand.get(cardToPlay));
-            client.writeMessage(hand.get(cardToPlay));
+            client.writeMessage(">table " + hand.get(cardToPlay));
             return hand.get(cardToPlay);
 
         } else {
