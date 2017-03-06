@@ -97,7 +97,6 @@ public class Server {
         try {
             out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true); // searches the player socket by its name on the sockets map
             out.println(message);
-            out.println("||");
             System.out.println(message);
         } catch (IOException e) {
             e.printStackTrace();

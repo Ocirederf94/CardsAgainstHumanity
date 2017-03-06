@@ -52,7 +52,7 @@ public class Client {
 
                result = in.readLine();
 
-                    System.out.println(result);
+                    //System.out.println(result);
                     return result;
 
                 //result += messageFromServer;

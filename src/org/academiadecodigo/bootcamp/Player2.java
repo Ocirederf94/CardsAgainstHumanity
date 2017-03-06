@@ -12,10 +12,11 @@ public class Player2 {
     private Client client;
     private String cards;
     private String tableCards;
-    private ArrayList<java.lang.String> hand;
-    private ArrayList<java.lang.String> table;
+    private ArrayList<String> hand;
+    private ArrayList<String> table;
     private int intGet = 0;
     private String blackCard;
+    private int cardToChoose;
 
     public Player2() {
         client = new Client();
@@ -57,16 +58,28 @@ public class Player2 {
     }
 
     public void play() {
-        String string = client.getMessageFromServer();
-        String[]teste = string.split(" ");
+        String string;
+        String[]teste;
         while (true) {
 
+            string = client.getMessageFromServer();
+            teste = string.split(" ");
 
             switch(teste[0]){
+                case ">black":
+                    System.out.println(string);
+                    continue;
+
+
+
                 case ">white":
                     hand.add(string);
-                    playCard();
-                    break;
+                    System.out.println(string);
+                    if (hand.size() >= 10){
+                        playCard();
+                        System.out.println("Removed Card: " + hand.remove(cardToChoose));
+                    }
+                    continue;
                 case ">czar":
                     System.out.println("I am THE CZAR!!!!");
                     chooseCard();
@@ -130,7 +143,7 @@ public class Player2 {
     }
 
     private String chooseCard() { /////// METHOD FROM CZAR
-        int cardToChoose = -1;
+        cardToChoose = -1;
          //addBlackCard();
         getTableCards();
         while (table.size() < 4) {
@@ -166,7 +179,7 @@ public class Player2 {
 
     private String playCard() {
         int cardToPlay = -1;
-        //addBlackCard();
+       // addBlackCard();
         System.out.println("YOUR HAND: " + hand);
         System.out.println("Size of the hand: " + hand.size());
         Scanner scanner = new Scanner(System.in);
@@ -189,6 +202,8 @@ public class Player2 {
 
     public static void main(String[] args) {
         Player2 player = new Player2();
-        player.play();
+       while (true) {
+           player.play();
+       }
     }
 }
