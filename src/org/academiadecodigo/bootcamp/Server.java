@@ -38,8 +38,8 @@ public class Server {
         int portNumber = 9090;
         clientSocket = null;
         ServerSocket serverSocket = null;
-        mapOfPlayersSockets = new ConcurrentHashMap();
-        tableOfCzarCards = new ConcurrentHashMap();
+        mapOfPlayersSockets = new ConcurrentHashMap<>();
+        tableOfCzarCards = new ConcurrentHashMap<>();
 
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
@@ -75,17 +75,17 @@ public class Server {
     public Socket findPlayer(String stringValue) {
         synchronized (mapOfPlayersSockets) {
             Iterator<Socket> it = mapOfPlayersSockets.keySet().iterator();
-            Socket socket = null;  //?
+            Socket socket = null;
 
             while (it.hasNext()) {
                 Socket current = it.next();
 
-                if (mapOfPlayersSockets.get(current).equals(stringValue)) { // removed to lowercase
+                if (mapOfPlayersSockets.get(current).equals(stringValue)) {
                     socket = current;
                     break;
                 }
             }
-            return socket; // returns the socket of the found player?
+            return socket;
         }
     }
 
@@ -125,7 +125,9 @@ public class Server {
         }
     }
 
+
     //sends game message to all players
+
     public void sendToAll(String message) {
         synchronized (mapOfPlayersSockets) {
             PrintWriter out;
@@ -159,15 +161,16 @@ public class Server {
     }
 
 
-    public int checkScore(Socket msgSocket, String string){
+    public int checkScore(Socket msgSocket, String string) {
         String[] parts = string.split(" ");
-        if(parts[0].equals(">checkScore")){
+        if (parts[0].equals(">checkScore")) {
             score = Integer.parseInt(parts[1]);
         }
         return score;
     }
 
     int score = 0;
+
     //implements methods used by chat commands
     public boolean parser(Socket msgSocket, String string) { // The message (string) received from this socket is parsed
         String winningCard = "";
@@ -234,7 +237,7 @@ public class Server {
                         for (int i = 0; i < parts.length; i++) {
                             winningCard += parts[i];
                         }
-                         // removes the winning card and socket from the table of czar map.
+                        // removes the winning card and socket from the table of czar map.
 
                         synchronized (tableOfCzarCards) {
                             Iterator<Socket> it = tableOfCzarCards.keySet().iterator();
@@ -285,7 +288,6 @@ public class Server {
                     checkConnection();
                     if (!clientSocket.isClosed()) {
                         System.out.println(msg);
-                        //receives the message from the server and decides what to do with ir
                         if (sendToAll) {
                             continue;
                         }

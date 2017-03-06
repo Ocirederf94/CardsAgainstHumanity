@@ -44,7 +44,6 @@ public class WhiteDeck {
             whiteDeck.remove(id);
             hand += card + "\n";
         }
-        System.out.println(hand);
         return hand;
     }
 }

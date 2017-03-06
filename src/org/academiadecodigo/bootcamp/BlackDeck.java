@@ -38,7 +38,6 @@ public class BlackDeck {
             blackDeck.remove(id);
             hand += card + "\n";
         }
-        System.out.println(hand);
         return hand;
     }
 }

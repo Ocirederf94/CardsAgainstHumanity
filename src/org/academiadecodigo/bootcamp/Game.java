@@ -48,14 +48,13 @@ public class Game {
             //manda a todos uma carta preta
             server.sendToAll(">black " + (blackDeck.giveBlackCard(1)));
 
-            //TODO os clientes têm de apagar os comandos, fred!
-
 
             //manda 10 cartas brancas para todos
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
                 if (gameRound ==1){
                     // for (int i = 0; i <10; i++) {
-                        server.sendToPlayer(">white " + (whiteDeck.giveCard(10)), server.getMapOfPlayersSockets().get(player));
+                        server.sendToPlayer(">white " + whiteDeck.giveCard(10), server.getMapOfPlayersSockets().get(player));
+
                     }
                 //}
             }
