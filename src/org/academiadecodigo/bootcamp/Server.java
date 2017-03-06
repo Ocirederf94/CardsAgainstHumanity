@@ -44,19 +44,14 @@ public class Server {
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
         try {
             serverSocket = new ServerSocket(portNumber);
-            System.out.println("Server started and binded to port: " + portNumber);
 
             while (mapOfPlayersSockets.size() < 5) {
 
                 clientSocket = serverSocket.accept();
-                System.out.println("Server accepted a client with socket: " + clientSocket.toString());
                 Thread client = new Thread(new ClientHandler(clientSocket));
-                System.out.println("Server started a new thread (" + client.toString() + ") a client with socket: " + clientSocket.toString());
                 client.start(); // What is this?
                 mapOfPlayersSockets.put(clientSocket, "player" + counter);
-                System.out.println("Server added a new player (player" + counter + ") to the map of socket clients with socket: " + clientSocket.toString());
                 counter++;
-                System.out.println("Key set list. " + mapOfPlayersSockets.keySet() + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,7 +82,6 @@ public class Server {
 
                 if (mapOfPlayersSockets.get(current).equals(stringValue)) { // removed to lowercase
                     socket = current;
-                    System.out.println("Sending a message to socket: " + current);
                     break;
                 }
             }
