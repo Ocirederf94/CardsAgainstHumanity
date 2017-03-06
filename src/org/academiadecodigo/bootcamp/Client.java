@@ -46,14 +46,25 @@ public class Client {
 
     public String getMessageFromServer() {
         messageFromServer = null;
+        String result = null;
         try {
-            while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty()) {
+            //while ((messageFromServer = in.readLine()) != null) {
 
-                messageFromServer = messageFromServer + "\n";
-                //   System.out.println("XALANA ISTO É O QUE TA A CHEGAR: " + messageFromServer);
-                return messageFromServer;
+               result = in.readLine();
 
-            }
+                    System.out.println(result);
+                    return result;
+
+                //result += messageFromServer;
+               // System.out.println("XALANA ISTO É O QUE TA A CHEGAR: " + messageFromServer);
+
+
+
+
+         //  }
+           // System.out.println("saiu");
+           // System.out.println(result);
+           // return messageFromServer.toLowerCase();
         } catch (IOException e) {
             e.printStackTrace();
         }

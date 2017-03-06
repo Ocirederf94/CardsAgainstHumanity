@@ -57,8 +57,36 @@ public class Player2 {
     }
 
     public void play() {
+        String string = client.getMessageFromServer();
+        String[]teste = string.split(" ");
         while (true) {
-            if (client.getMessageFromServer().contains(">white ")) {
+
+
+            switch(teste[0]){
+                case ">white":
+                    hand.add(string);
+                    playCard();
+                    break;
+                case ">czar":
+                    System.out.println("I am THE CZAR!!!!");
+                    chooseCard();
+                    System.out.println("After chooseCard()");
+                    for (int i = 0; i < table.size(); i++) {
+                        System.out.println("Removing from table: " + table.remove(i));
+                    }
+                    while (!client.getMessageFromServer().contains(">winnerCard")) {
+                        try {
+                            System.out.println("Waiting for winner IN CZAR");
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    System.out.println("czar");
+                    break;
+
+            }
+            /*if (client.getMessageFromServer().contains(">white ")) {
                 System.out.println("In play");
                 addCards();
                 System.out.println("After addCards");
@@ -81,7 +109,7 @@ public class Player2 {
                 }
             }
 
-             else if (client.getMessageFromServer().contains(">Czar ")) {
+             if (client.getMessageFromServer().contains(">Czar ")) {
                 System.out.println("I am THE CZAR!!!!");
                 chooseCard();
                 System.out.println("After chooseCard()");
@@ -96,14 +124,14 @@ public class Player2 {
                         e.printStackTrace();
                     }
                 }
-            }
+            }*/
         }
 
     }
 
     private String chooseCard() { /////// METHOD FROM CZAR
         int cardToChoose = -1;
-        //  addBlackCard();
+         //addBlackCard();
         getTableCards();
         while (table.size() < 4) {
             System.out.println("Waiting for players to Play");

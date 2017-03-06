@@ -97,6 +97,7 @@ public class Server {
         try {
             out = new PrintWriter(findPlayer(stringValue).getOutputStream(), true); // searches the player socket by its name on the sockets map
             out.println(message);
+            out.println("||");
             System.out.println(message);
         } catch (IOException e) {
             e.printStackTrace();
@@ -130,7 +131,7 @@ public class Server {
 
     public void sendToAll(String message) {
         synchronized (mapOfPlayersSockets) {
-            PrintWriter out;
+            PrintWriter out = null;
             Iterator<Socket> it = mapOfPlayersSockets.keySet().iterator();
             while (it.hasNext()) {
                 Socket tmp = it.next();

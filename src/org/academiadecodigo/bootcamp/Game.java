@@ -52,11 +52,11 @@ public class Game {
             //manda 10 cartas brancas para todos
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
                 if (gameRound ==1){
-                    // for (int i = 0; i <10; i++) {
-                        server.sendToPlayer(">white " + whiteDeck.giveCard(10), server.getMapOfPlayersSockets().get(player));
+                     for (int i = 0; i <10; i++) {
+                        server.sendToPlayer(">white " + whiteDeck.giveCard(1), server.getMapOfPlayersSockets().get(player));
 
                     }
-                //}
+                }
             }
 
             //manda mais uma carta branca a cada um (a cada ronda, tb a contar com a primeira
