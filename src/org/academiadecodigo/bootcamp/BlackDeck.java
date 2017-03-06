@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BlackDeck {
 
     private final ReadFile readFile;
-    private int numberOfBlackCardsInDeck = 1448;
+    private int numberOfBlackCardsInDeck = 1286;
     private ConcurrentHashMap<String, String> blackDeck;
 
     public BlackDeck() {

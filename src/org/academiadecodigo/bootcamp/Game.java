@@ -46,7 +46,7 @@ public class Game {
             server.sendToPlayer(">Czar \n yes\n ||", whoIsTheCzar); // who is the czar is the socket of the czar
 
             //manda a todos uma carta preta
-            server.sendToAll(">black \n------------- Black Card ---------------\n" + (blackDeck.giveBlackCard(1)+ "---------------- choose a white card --------------\n||"));
+            server.sendToAll(">black \n--------------- Black Card ---------------\n" + (blackDeck.giveBlackCard(1)+ "---------------- choose a white card --------------\n||"));
 
             //TODO os clientes têm de apagar os comandos, fred!
 
@@ -54,8 +54,9 @@ public class Game {
             //manda 10 cartas brancas para todos
             for (Socket player : server.getMapOfPlayersSockets().keySet()) {
                 if (gameRound ==1){
-                server.sendToPlayer(">white \n" + (whiteDeck.giveCard(10)), server.getMapOfPlayersSockets().get(player));
-                server.sendToPlayer("||", server.getMapOfPlayersSockets().get(player));
+                    for (int i = 0; i <10; i++) {
+                        server.sendToPlayer(">white \n" + (whiteDeck.giveCard(1)), server.getMapOfPlayersSockets().get(player) + "||");
+                    }
                 }
             }
 
@@ -93,15 +94,22 @@ public class Game {
 
  // Working on it
 
-//            while (server.getTableOfCzarCards().size() != 3) {
-//                server.sendToPlayer(">winnerCard ", whoIsTheCzar);
-//                server.sendToPlayer(">score " , server.getWinCard().get());
-//            }
+            while (server.getTableOfCzarCards().size() != 3) {
+                server.sendToPlayer(">winnerCard ", whoIsTheCzar);
+            }
+
+
             //TODO atribuir um ponto ao vencedor: papel e caneta acho q tenho de pegar na carta escolhida,
             //TODO ver de quem é e aumentar um ponto ao dono dela,-> solve that and... profit!!!
+            server.sendToAll(">checkScore ");
+            if(server.score!= gameOver){
+                server.sendToAll("" + server.score);
 
-            //if(playerscore(ta mal!!) != gameOver){
-            startRound();
+            }
+            if(server.score != gameOver){
+                startRound();
+            }
+
         }
 
         //TODO enviar o winner aos players

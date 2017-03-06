@@ -16,11 +16,6 @@ public class Server {
 
     private ConcurrentHashMap<Socket, String> mapOfPlayersSockets;
     private ConcurrentHashMap<Socket, String> tableOfCzarCards;
-    private ConcurrentHashMap<Socket, String> winCard;
-
-    public ConcurrentHashMap<Socket, String> getWinCard() {
-        return winCard;
-    }
 
     public ConcurrentHashMap<Socket, String> getMapOfPlayersSockets() {
         return mapOfPlayersSockets;
@@ -44,7 +39,6 @@ public class Server {
         clientSocket = null;
         ServerSocket serverSocket = null;
         mapOfPlayersSockets = new ConcurrentHashMap();
-        winCard = new ConcurrentHashMap();
         tableOfCzarCards = new ConcurrentHashMap();
 
 //creates the sockets used and the thread clientHandler, puts the client sockets in a hashmap
@@ -57,12 +51,12 @@ public class Server {
                 clientSocket = serverSocket.accept();
                 System.out.println("Server accepted a client with socket: " + clientSocket.toString());
                 Thread client = new Thread(new ClientHandler(clientSocket));
-                System.out.println("Server started a new thread (" + client.toString() +") a client with socket: " + clientSocket.toString());
+                System.out.println("Server started a new thread (" + client.toString() + ") a client with socket: " + clientSocket.toString());
                 client.start(); // What is this?
                 mapOfPlayersSockets.put(clientSocket, "player" + counter);
-                System.out.println("Server added a new player (player" + counter +") to the map of socket clients with socket: " + clientSocket.toString());
+                System.out.println("Server added a new player (player" + counter + ") to the map of socket clients with socket: " + clientSocket.toString());
                 counter++;
-                System.out.println("Key set list. " + mapOfPlayersSockets.keySet()+ "\n");
+                System.out.println("Key set list. " + mapOfPlayersSockets.keySet() + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -170,6 +164,16 @@ public class Server {
         }
     }
 
+
+    public int checkScore(Socket msgSocket, String string){
+        String[] parts = string.split(" ");
+        if(parts[0].equals(">checkScore")){
+            score = Integer.parseInt(parts[1]);
+        }
+        return score;
+    }
+
+    int score = 0;
     //implements methods used by chat commands
     public boolean parser(Socket msgSocket, String string) { // The message (string) received from this socket is parsed
         String winningCard = "";
@@ -220,7 +224,7 @@ public class Server {
                             whiteCard += parts[i];
                         }
                         tableOfCzarCards.put(msgSocket, whiteCard); // this message (submitted card)is put into the czarTable map with
-                                                                    // a socket key and message value from the player that send it
+                        // a socket key and message value from the player that send it
                         synchronized (tableOfCzarCards) {
                             if (tableOfCzarCards.size() == 4) {
                                 tableOfCzarCards.notifyAll();
@@ -228,7 +232,7 @@ public class Server {
                         }
 
                     }
-                    sendToAll = true;
+
                     break;
 
                 case ">winnerCard":// adds the winning card to the wincard Map
@@ -236,15 +240,31 @@ public class Server {
                         for (int i = 0; i < parts.length; i++) {
                             winningCard += parts[i];
                         }
-                        tableOfCzarCards.remove(msgSocket, winningCard); // removes the winning card and socket from the table of czar map.
+                         // removes the winning card and socket from the table of czar map.
 
-                        winCard.put(msgSocket, winningCard); // the removed card and socket is placed in the winning card map.
+                        synchronized (tableOfCzarCards) {
+                            Iterator<Socket> it = tableOfCzarCards.keySet().iterator();
+                            Socket socket = null;  //?
 
+                            while (it.hasNext()) {
+                                Socket current = it.next();
+                                if (tableOfCzarCards.get(current).equals(winningCard)) { // removed to lowercase
+                                    socket = current;
+                                    break;
+                                }
+                            }
+
+                            sendToPlayer(">setscore ", mapOfPlayersSockets.get(socket));
+                            tableOfCzarCards.remove(msgSocket, winningCard);
+                        }
+                        break;
                     }
-                    break;
             }
+
+            return sendToAll;
+
+
         }
-        return sendToAll;
     }
 
     //clientHandler thread
@@ -267,6 +287,7 @@ public class Server {
                     msg = in.readLine();
                     closeClient(clientSocket, msg);
                     boolean sendToAll = parser(clientSocket, msg);
+                    checkScore(clientSocket, msg);
                     checkConnection();
                     if (!clientSocket.isClosed()) {
                         System.out.println(msg);
