@@ -50,7 +50,7 @@ public class Client {
             while ((messageFromServer = in.readLine()) != null || in.readLine().isEmpty()) {
 
                 messageFromServer = messageFromServer + "\n";
-                // System.out.println(messageFromServer);
+                 System.out.println("XALANA ISTO É O QUE TA A CHEGAR: " + messageFromServer);
                 return messageFromServer;
 
             }
